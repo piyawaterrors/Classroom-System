@@ -1,0 +1,656 @@
+<div class="flex flex-col lg:flex-row h-auto lg:h-full w-full p-4 gap-4">
+  <!-- LEFT SIDEBAR: Control Panel (Work Area) -->
+  <aside
+    class="w-full lg:w-80 glass-panel shadow-xl flex flex-col rounded-[24px] overflow-hidden shrink-0 h-auto lg:h-full order-1"
+  >
+    <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
+      <!-- Header -->
+      <div
+        class="flex items-center gap-2 mb-5 text-indigo-500 text-xs font-bold uppercase tracking-wider"
+      >
+        <i class="fa-solid fa-flask"></i> ส่วนจัดการคะแนน
+      </div>
+
+      <!-- 1. Configuration (Group & Lab) -->
+      <div class="space-y-4 mb-6">
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 ml-1 uppercase"
+            >1. เลือกกลุ่มเรียน</label
+          >
+          <div class="relative mt-1">
+            <select
+              id="labGroupSelect"
+              onchange="loadLabData()"
+              class="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer shadow-sm text-slate-700 font-medium"
+            >
+              <option value="">-- กรุณาเลือก --</option>
+            </select>
+            <div
+              class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400"
+            >
+              <i class="fa-solid fa-chevron-down text-xs"></i>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="opacity-50 pointer-events-none transition-all duration-300"
+          id="step2Panel"
+        >
+          <label class="text-[10px] font-bold text-slate-400 ml-1 uppercase"
+            >2. หัวข้อแลบ</label
+          >
+          <div class="relative mt-1">
+            <select
+              id="assignmentSelect"
+              onchange="handleLabSelect()"
+              class="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 outline-none cursor-pointer shadow-sm text-slate-700 font-medium"
+            >
+              <option value="">-- รอโหลดข้อมูล... --</option>
+            </select>
+            <div
+              class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400"
+            >
+              <i class="fa-solid fa-chevron-down text-xs"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="border-slate-100 mb-6" />
+
+      <!-- 2. Scoring Section -->
+      <div
+        id="gradingPanel"
+        class="opacity-50 pointer-events-none transition-all duration-300"
+      >
+        <div
+          class="flex items-center gap-2 mb-4 text-indigo-600 text-xs font-bold uppercase tracking-wider"
+        >
+          <i class="fa-solid fa-pen-to-square"></i> ให้คะแนน
+        </div>
+
+        <!-- Student Selection -->
+        <div class="mb-5">
+          <label
+            class="text-[10px] font-bold text-slate-400 ml-1 uppercase block mb-1"
+            >3. เลือกนักศึกษา</label
+          >
+          <div class="relative">
+            <select id="studentSelect" class="w-full"></select>
+          </div>
+        </div>
+
+        <!-- Selected Student Display -->
+        <div
+          id="selectedStudentCard"
+          class="hidden mb-6 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 p-4 rounded-2xl flex items-center justify-between shadow-sm animate-entry"
+        >
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div
+              class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-50 shrink-0"
+            >
+              <i class="fa-solid fa-user-graduate"></i>
+            </div>
+            <div class="min-w-0">
+              <h3
+                class="text-sm font-bold text-slate-800 truncate"
+                id="displayStudentName"
+              >
+                Name
+              </h3>
+              <p
+                class="text-sm font-bold text-indigo-500 bg-indigo-50/50 inline-block rounded"
+                id="displayStudentID"
+              >
+                ID
+              </p>
+            </div>
+          </div>
+
+          <button
+            onclick="clearStudentSelection()"
+            class="w-10 h-10 bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-full flex items-center justify-center transition shadow-sm"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Score Buttons -->
+        <div class="space-y-4">
+          <!-- Slot 1 -->
+          <div
+            class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm"
+          >
+            <label
+              class="block text-[10px] font-bold text-slate-400 mb-2 text-center uppercase tracking-widest"
+              >คะแนนช่องที่ 1</label
+            >
+            <div class="flex justify-center gap-1" id="scoreGroup1"></div>
+          </div>
+          <!-- Slot 2 -->
+          <div
+            class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm"
+          >
+            <label
+              class="block text-[10px] font-bold text-slate-400 mb-2 text-center uppercase tracking-widest"
+              >คะแนนช่องที่ 2</label
+            >
+            <div class="flex justify-center gap-1" id="scoreGroup2"></div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          onclick="submitLabScore()"
+          id="btnSubmitLab"
+          class="w-full btn-primary py-3.5 rounded-xl text-base font-bold flex items-center justify-center gap-2 mt-6 shadow-lg shadow-indigo-500/20 active:scale-95 transition-transform"
+        >
+          <i class="fa-solid fa-floppy-disk"></i> บันทึกคะแนน
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT MAIN CONTENT: Dashboard -->
+  <main
+    class="w-full lg:flex-1 overflow-visible lg:overflow-y-auto pl-0 lg:pl-0 order-2"
+  >
+    <!-- Stats Cards (Grid 3 like Check-in) -->
+    <div
+      class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 animate-entry"
+      style="animation-delay: 0.1s"
+    >
+      <!-- Card Total -->
+      <div
+        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-indigo-300 transition-all duration-300"
+      >
+        <div
+          class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-indigo-50/50 to-transparent"
+        ></div>
+        <div class="relative z-10">
+          <p
+            class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1"
+          >
+            นักศึกษาทั้งหมด
+          </p>
+          <h3 id="dashTotal" class="text-4xl font-bold text-slate-700">0</h3>
+        </div>
+        <div
+          class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-500 shadow-sm group-hover:scale-110 transition duration-300"
+        >
+          <i class="fa-solid fa-users text-xl"></i>
+        </div>
+      </div>
+
+      <!-- Card Submitted -->
+      <div
+        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-emerald-300 transition-all duration-300"
+      >
+        <div
+          class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-emerald-50/50 to-transparent"
+        ></div>
+        <div class="relative z-10">
+          <p
+            class="text-emerald-500 text-[10px] font-bold uppercase tracking-wider mb-1"
+          >
+            ส่งงานแล้ว
+          </p>
+          <h3 id="dashSubmitted" class="text-4xl font-bold text-emerald-600">
+            0
+          </h3>
+        </div>
+        <div
+          class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm group-hover:scale-110 transition duration-300"
+        >
+          <i class="fa-solid fa-file-circle-check text-xl"></i>
+        </div>
+      </div>
+
+      <!-- Card Missing -->
+      <div
+        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-rose-300 transition-all duration-300"
+      >
+        <div
+          class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-rose-50/50 to-transparent"
+        ></div>
+        <div class="relative z-10">
+          <p
+            class="text-rose-500 text-[10px] font-bold uppercase tracking-wider mb-1"
+          >
+            ยังไม่ส่ง / ขาด
+          </p>
+          <h3 id="dashMissing" class="text-4xl font-bold text-rose-600">0</h3>
+        </div>
+        <div
+          class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 shadow-sm group-hover:scale-110 transition duration-300"
+        >
+          <i class="fa-solid fa-file-circle-xmark text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Table -->
+    <div
+      class="glass-panel rounded-[24px] h-[500px] lg:h-[calc(100%-140px)] flex flex-col overflow-hidden relative shadow-xl animate-entry mb-4 lg:mb-0"
+      style="animation-delay: 0.2s"
+    >
+      <div
+        class="p-5 border-b border-slate-100 flex justify-between items-center bg-white/60 backdrop-blur-md sticky top-0 z-10"
+      >
+        <h3 class="font-bold text-slate-700 flex items-center gap-3 text-lg">
+          <div
+            class="bg-gradient-to-br from-indigo-500 to-violet-600 p-2 rounded-lg text-white shadow-md shadow-indigo-500/20"
+          >
+            <i class="fa-solid fa-list-check"></i>
+          </div>
+          รายการส่งงาน
+        </h3>
+        <div class="flex items-center gap-2">
+          <button
+            onclick="refreshLabStats()"
+            class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-indigo-600 transition"
+          >
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto student-list bg-white/40">
+        <table class="w-full text-left border-collapse">
+          <thead
+            class="bg-slate-50/80 text-slate-400 text-[10px] font-bold uppercase sticky top-0 z-10 backdrop-blur-sm shadow-sm"
+          >
+            <tr>
+              <th class="p-4 w-12 text-center">#</th>
+              <th class="p-4 w-28 lg:w-32">รหัสนักศึกษา</th>
+              <th class="p-4">ชื่อ-นามสกุล</th>
+              <th class="p-4 text-center w-24 lg:w-32">คะแนน</th>
+              <th class="p-4 text-center w-32 lg:w-40">สถานะ</th>
+            </tr>
+          </thead>
+          <tbody
+            id="labTableBody"
+            class="text-sm text-slate-600 divide-y divide-slate-100 bg-white/60"
+          >
+            <tr>
+              <td colspan="5" class="p-20 text-center text-slate-400 italic">
+                <div class="flex flex-col items-center gap-4 opacity-60">
+                  <i
+                    class="fa-solid fa-clipboard-question text-6xl text-slate-300"
+                  ></i>
+                  <span>กรุณาเลือกกลุ่มและหัวข้อแลบทางด้านซ้าย</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  let labGroups = [];
+  let allStudents = [];
+  let selectedStudent = null;
+  let currentScore1 = 0;
+  let currentScore2 = 0;
+  let choicesInstance = null;
+
+  // Initial
+  (function () {
+    renderScoreButtons(1);
+    renderScoreButtons(2);
+    initChoices();
+    google.script.run
+      .withSuccessHandler((data) => {
+        labGroups = data;
+        const select = document.getElementById("labGroupSelect");
+        data.forEach((g, i) => {
+          let opt = document.createElement("option");
+          opt.value = i;
+          opt.text = g.name;
+          select.appendChild(opt);
+        });
+      })
+      .getGroups();
+  })();
+
+  function renderScoreButtons(groupNum) {
+    const container = document.getElementById(`scoreGroup${groupNum}`);
+    let html = "";
+    for (let i = 1; i <= 5; i++) {
+      html += `<button onclick="toggleScore(${groupNum}, ${i})" id="s${groupNum}-${i}" class="w-9 h-9 md:w-10 md:h-10 rounded-lg border border-slate-200 font-bold text-slate-400 hover:border-indigo-300 hover:text-indigo-600 hover:bg-white hover:shadow-md transition-all bg-slate-50 flex items-center justify-center text-sm">${i}</button>`;
+    }
+    container.innerHTML = html;
+  }
+
+  // 1. Load Data
+  function loadLabData() {
+    const idx = document.getElementById("labGroupSelect").value;
+    resetSteps();
+    resetDashboard();
+    if (idx === "") return;
+
+    const group = labGroups[idx];
+    const labSelect = document.getElementById("assignmentSelect");
+    labSelect.innerHTML = "<option>กำลังโหลดข้อมูล...</option>";
+    labSelect.disabled = true;
+
+    if (choicesInstance) {
+      choicesInstance.setChoices(
+        [{ value: "", label: "กำลังโหลดรายชื่อ...", disabled: true }],
+        "value",
+        "label",
+        true
+      );
+      choicesInstance.disable();
+    }
+
+    google.script.run
+      .withSuccessHandler((res) => {
+        if (res.success) {
+          labSelect.innerHTML =
+            '<option value="">-- เลือกหัวข้อแลบ --</option>';
+          if (res.labs.length > 0) {
+            res.labs.forEach((lab) => {
+              let opt = document.createElement("option");
+              opt.value = lab.colIndex;
+              opt.text = lab.name;
+              labSelect.appendChild(opt);
+            });
+            labSelect.disabled = false;
+            document
+              .getElementById("step2Panel")
+              .classList.remove("opacity-50", "pointer-events-none");
+          } else {
+            labSelect.innerHTML = "<option>ไม่พบหัวข้อแลบ</option>";
+          }
+
+          allStudents = res.data;
+          const choicesData = allStudents.map((s) => ({
+            value: JSON.stringify({ id: s.id, name: s.name }),
+            label: `${s.id} - ${s.name}`,
+          }));
+          choicesData.unshift({
+            value: "",
+            label: "ค้นหาชื่อ หรือ รหัสนักศึกษา...",
+            placeholder: true,
+            selected: true,
+          });
+          initChoices(choicesData);
+        } else {
+          Swal.fire("Error", res.msg, "error");
+        }
+      })
+      .getLabInitData(group.id);
+  }
+
+  function handleLabSelect() {
+    const labVal = document.getElementById("assignmentSelect").value;
+    if (labVal !== "") {
+      document
+        .getElementById("gradingPanel")
+        .classList.remove("opacity-50", "pointer-events-none");
+      if (choicesInstance) choicesInstance.enable();
+      loadLabTable();
+    } else {
+      document
+        .getElementById("gradingPanel")
+        .classList.add("opacity-50", "pointer-events-none");
+      if (choicesInstance) choicesInstance.disable();
+      resetDashboard();
+    }
+  }
+
+  // --- DASHBOARD ---
+  function loadLabTable() {
+    const groupIdx = document.getElementById("labGroupSelect").value;
+    const colIndex = document.getElementById("assignmentSelect").value;
+    if (groupIdx === "" || colIndex === "") return;
+    const group = labGroups[groupIdx];
+
+    const tbody = document.getElementById("labTableBody");
+    tbody.innerHTML =
+      '<tr><td colspan="5" class="p-12 text-center text-slate-400 italic"><div class="flex flex-col items-center gap-2 opacity-80 text-lg font-bold text-indigo-500"><i class="fa-solid fa-circle-notch fa-spin text-3xl"></i> กำลังโหลดข้อมูล...</div></td></tr>';
+
+    google.script.run
+      .withSuccessHandler((res) => {
+        if (res.success) {
+          if (res.studentList && res.studentList.length > 0) {
+            let html = "";
+            let submittedCount = 0;
+            let missingCount = 0;
+
+            res.studentList.forEach((std, i) => {
+              const isSubmitted = std.status === "Submitted";
+              if (isSubmitted) submittedCount++;
+              else missingCount++;
+
+              const statusBadge = isSubmitted
+                ? `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 shadow-sm"><i class="fa-solid fa-check mr-1"></i> ส่งแล้ว</span>`
+                : `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-500 border border-rose-100">ขาดส่ง</span>`;
+
+              const rowClass = isSubmitted
+                ? "bg-emerald-50/40"
+                : "hover:bg-rose-50/50 cursor-pointer group";
+              const idClass = isSubmitted
+                ? "text-indigo-600 font-bold"
+                : "text-slate-500";
+
+              html += `<tr class="border-b border-slate-50 last:border-0 transition ${rowClass}" onclick="selectStudentFromTable('${
+                std.id
+              }')">
+                          <td class="p-4 text-slate-400 font-mono text-xs text-center">${
+                            i + 1
+                          }</td>
+                          <td class="p-4 font-mono ${idClass}">${std.id}</td>
+                          <td class="p-4 font-medium text-slate-700">${
+                            std.name
+                          }</td>
+                          <td class="p-4 text-center text-xs font-bold text-slate-400">${
+                            std.score
+                          }</td>
+                          <td class="p-4 text-center">${statusBadge}</td>
+                      </tr>`;
+            });
+            tbody.innerHTML = html;
+
+            // Update Stats Cards
+            animateValue(
+              "dashTotal",
+              parseInt(document.getElementById("dashTotal").innerText),
+              res.studentList.length,
+              500
+            );
+            animateValue(
+              "dashSubmitted",
+              parseInt(document.getElementById("dashSubmitted").innerText),
+              submittedCount,
+              500
+            );
+            animateValue(
+              "dashMissing",
+              parseInt(document.getElementById("dashMissing").innerText),
+              missingCount,
+              500
+            );
+          } else {
+            tbody.innerHTML =
+              '<tr><td colspan="5" class="p-12 text-center text-slate-400 italic">ไม่พบรายชื่อนักศึกษา</td></tr>';
+          }
+        }
+      })
+      .getLabStats(group.id, colIndex);
+  }
+
+  function refreshLabStats() {
+    const icon = event.currentTarget.querySelector("i");
+    icon.classList.add("fa-spin");
+    loadLabTable();
+    setTimeout(() => icon.classList.remove("fa-spin"), 1000);
+  }
+
+  function resetDashboard() {
+    document.getElementById("labTableBody").innerHTML =
+      '<tr><td colspan="5" class="p-20 text-center text-slate-400 italic"><div class="flex flex-col items-center gap-4 opacity-60"><i class="fa-solid fa-clipboard-question text-6xl text-slate-300"></i><span>กรุณาเลือกกลุ่มและหัวข้อแลบ</span></div></td></tr>';
+    document.getElementById("dashTotal").innerText = "0";
+    document.getElementById("dashSubmitted").innerText = "0";
+    document.getElementById("dashMissing").innerText = "0";
+  }
+
+  // --- SELECTION ---
+  function initChoices(items = []) {
+    const element = document.getElementById("studentSelect");
+    if (choicesInstance) choicesInstance.destroy();
+    choicesInstance = new Choices(element, {
+      choices: items,
+      searchEnabled: true,
+      itemSelectText: "",
+      placeholder: true,
+      placeholderValue: "ค้นหาชื่อ...",
+      shouldSort: false,
+      fuseOptions: {
+        keys: ["label"],
+        includeScore: true,
+        threshold: 0.2,
+        location: 0,
+        distance: 100,
+        ignoreLocation: false,
+        minMatchCharLength: 2,
+      },
+    });
+    element.addEventListener("change", function (event) {
+      if (event.target.value) selectStudent(JSON.parse(event.target.value));
+      else clearStudentSelection();
+    });
+  }
+
+  function selectStudent(student) {
+    selectedStudent = student;
+    document.getElementById("displayStudentName").innerText = student.name;
+    document.getElementById("displayStudentID").innerText = student.id;
+    document.getElementById("selectedStudentCard").classList.remove("hidden");
+    resetScores();
+  }
+
+  function selectStudentFromTable(id) {
+    if (choicesInstance) {
+      const student = allStudents.find((s) => s.id === String(id));
+      if (student) {
+        const val = JSON.stringify({ id: student.id, name: student.name });
+        choicesInstance.setChoiceByValue(val);
+        selectStudent(student);
+      }
+    }
+  }
+
+  function clearStudentSelection() {
+    selectedStudent = null;
+    document.getElementById("selectedStudentCard").classList.add("hidden");
+    if (choicesInstance) choicesInstance.setChoiceByValue("");
+  }
+
+  // --- SCORING & UTILS ---
+  function toggleScore(group, score) {
+    if (group === 1) currentScore1 = currentScore1 === score ? 0 : score;
+    else currentScore2 = currentScore2 === score ? 0 : score;
+    updateButtonStyles();
+  }
+
+  function updateButtonStyles() {
+    for (let g = 1; g <= 2; g++) {
+      const current = g === 1 ? currentScore1 : currentScore2;
+      const activeClass =
+        g === 1
+          ? "bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-300 border-transparent transform scale-110"
+          : "bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-300 border-transparent transform scale-110";
+
+      for (let i = 1; i <= 5; i++) {
+        const btn = document.getElementById(`s${g}-${i}`);
+        if (current === i) {
+          btn.className = `w-9 h-9 md:w-10 md:h-10 rounded-lg border font-bold transition-all duration-300 flex items-center justify-center text-base ${activeClass}`;
+        } else {
+          btn.className =
+            "w-9 h-9 md:w-10 md:h-10 rounded-lg border border-slate-200 font-bold text-slate-400 hover:border-indigo-300 hover:text-indigo-600 hover:bg-white hover:shadow-md transition-all duration-300 bg-slate-50 flex items-center justify-center text-sm";
+        }
+      }
+    }
+  }
+
+  function resetScores() {
+    currentScore1 = 0;
+    currentScore2 = 0;
+    updateButtonStyles();
+  }
+
+  function resetSteps() {
+    document
+      .getElementById("step2Panel")
+      .classList.add("opacity-50", "pointer-events-none");
+    document
+      .getElementById("gradingPanel")
+      .classList.add("opacity-50", "pointer-events-none");
+    document.getElementById("assignmentSelect").innerHTML =
+      '<option value="">-- กรุณาเลือกกลุ่ม --</option>';
+    if (choicesInstance) {
+      choicesInstance.clearStore();
+      choicesInstance.disable();
+    }
+    clearStudentSelection();
+  }
+
+  function submitLabScore() {
+    if (!selectedStudent) return;
+    const idx = document.getElementById("labGroupSelect").value;
+    const group = labGroups[idx];
+    const colStart = document.getElementById("assignmentSelect").value;
+    const btn = document.getElementById("btnSubmitLab");
+
+    btn.disabled = true;
+    btn.innerHTML =
+      '<i class="fa-solid fa-circle-notch fa-spin"></i> กำลังบันทึก...';
+
+    google.script.run
+      .withSuccessHandler((res) => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> บันทึกคะแนน';
+        if (res.success) {
+          const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          Toast.fire({
+            icon: "success",
+            title: `บันทึก: ${selectedStudent.name}`,
+          });
+          resetScores();
+          clearStudentSelection();
+          loadLabTable(); // Refresh table
+        } else Swal.fire("Error", res.msg, "error");
+      })
+      .saveLabAssignmentScore(
+        group.id,
+        selectedStudent.id,
+        parseInt(colStart),
+        currentScore1,
+        currentScore2
+      );
+  }
+
+  function animateValue(id, s, e, d) {
+    if (s === e) return;
+    const obj = document.getElementById(id);
+    let start = null;
+    const step = (t) => {
+      if (!start) start = t;
+      const p = Math.min((t - start) / d, 1);
+      obj.innerHTML = Math.floor(p * (e - s) + s);
+      if (p < 1) window.requestAnimationFrame(step);
+    };
+    window.requestAnimationFrame(step);
+  }
+</script>

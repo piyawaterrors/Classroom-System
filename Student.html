@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <base target="_top" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+    />
+    <title>Student Check-in</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+      body {
+        font-family: "Kanit", sans-serif;
+        background-color: #f8fafc;
+        overflow-x: hidden;
+      }
+
+      /* Animation Keyframes */
+      @keyframes float {
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
+        }
+
+        50% {
+          transform: translate(20px, -20px) scale(1.1);
+        }
+      }
+
+      .blob {
+        position: absolute;
+        filter: blur(50px);
+        opacity: 0.6;
+        animation: float 10s infinite ease-in-out;
+        z-index: -1;
+      }
+
+      .blob-1 {
+        top: -10%;
+        left: -10%;
+        width: 300px;
+        height: 300px;
+        background: #818cf8;
+      }
+
+      .blob-2 {
+        bottom: -10%;
+        right: -10%;
+        width: 250px;
+        height: 250px;
+        background: #c084fc;
+        animation-delay: 2s;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-entry {
+        opacity: 0;
+        animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      .delay-100 {
+        animation-delay: 0.1s;
+      }
+
+      .delay-200 {
+        animation-delay: 0.2s;
+      }
+
+      .delay-300 {
+        animation-delay: 0.3s;
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+
+        25% {
+          transform: translateX(-5px);
+        }
+
+        75% {
+          transform: translateX(5px);
+        }
+      }
+
+      .shake-hard {
+        animation: shake 0.3s ease-in-out 3;
+        border-color: #ef4444 !important;
+      }
+
+      .glass-header {
+        background: linear-gradient(
+          135deg,
+          rgba(79, 70, 229, 0.95),
+          rgba(124, 58, 237, 0.95)
+        );
+        backdrop-filter: blur(10px);
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%);
+        }
+
+        100% {
+          transform: translateX(100%);
+        }
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen flex items-center justify-center p-4 relative">
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+      <div class="blob blob-1 rounded-full"></div>
+      <div class="blob blob-2 rounded-full"></div>
+    </div>
+
+    <div
+      id="checkInPanel"
+      class="hidden w-full max-w-sm bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden transform transition-all animate-entry border border-white/50"
+    >
+      <!-- Header -->
+      <div
+        class="glass-header p-8 pb-12 text-white text-center relative overflow-hidden"
+      >
+        <div
+          class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 skew-x-12 translate-x-[-150%] animate-[shine_3s_infinite]"
+        ></div>
+        <div class="relative z-10 animate-entry delay-100">
+          <div
+            class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-lg border border-white/30"
+          >
+            <i
+              class="fa-solid fa-graduation-cap text-3xl text-white drop-shadow-md"
+            ></i>
+          </div>
+          <h1
+            class="text-2xl font-bold tracking-wide mb-2 drop-shadow-sm leading-tight"
+          >
+            <?= groupName ?>
+          </h1>
+          <div
+            class="inline-flex items-center gap-2 bg-black/20 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-medium border border-white/10 shadow-sm"
+          >
+            <span
+              class="w-2 h-2 bg-green-400 rounded-full animate-pulse"
+            ></span>
+            <span
+              >Week
+              <?= week ?></span
+            ><span class="opacity-50">|</span><span><?= type ?></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div
+        class="p-8 -mt-8 bg-white rounded-t-[2rem] relative z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]"
+      >
+        <div class="space-y-6">
+          <div class="animate-entry delay-200">
+            <label class="block text-slate-500 text-sm font-medium mb-2 ml-1"
+              >รหัสนักศึกษา</label
+            >
+            <div class="relative group">
+              <div
+                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+              >
+                <i
+                  class="fa-regular fa-id-card text-slate-400 group-focus-within:text-indigo-500 transition-colors"
+                ></i>
+              </div>
+              <input
+                type="text"
+                id="studentId"
+                class="w-full pl-11 pr-4 py-4 bg-slate-50 border-2 border-slate-100 text-slate-800 text-lg font-bold rounded-2xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all placeholder:text-slate-300 font-mono tracking-wide"
+                placeholder="XXXXXXXX"
+              />
+            </div>
+          </div>
+
+          <div class="animate-entry delay-300">
+            <button
+              id="btnCheck"
+              onclick="getLocationAndSubmit()"
+              class="group relative w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-500/40 active:scale-[0.98] transition-all overflow-hidden"
+            >
+              <div
+                class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"
+              ></div>
+              <!-- ใช้ flex justify-center เพื่อจัดข้อความให้อยู่ตรงกลาง -->
+              <div
+                class="relative flex items-center justify-center gap-3 text-lg w-full"
+              >
+                <i
+                  class="fa-solid fa-location-arrow group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform"
+                ></i>
+                <span>ยืนยัน</span>
+              </div>
+            </button>
+          </div>
+
+          <div id="resultArea" class="hidden animate-entry">
+            <div
+              id="resultCard"
+              class="p-5 rounded-2xl border flex flex-col items-center text-center gap-2"
+            >
+              <div
+                id="iconStatusWrapper"
+                class="w-14 h-14 rounded-full flex items-center justify-center mb-1 text-3xl shadow-sm"
+              >
+                <i id="iconStatus"></i>
+              </div>
+              <div>
+                <h3 id="msgTitle" class="font-bold text-xl"></h3>
+                <p id="msgDetail" class="text-sm opacity-90"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-8 text-center animate-entry delay-300">
+          <p
+            class="text-[10px] text-slate-400 uppercase tracking-widest opacity-60"
+          >
+            Secure Check-in System
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="errorPanel"
+      class="hidden w-full max-w-sm bg-white/90 backdrop-blur rounded-3xl p-8 text-center shadow-2xl animate-entry border border-red-100"
+    >
+      <div
+        class="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 text-red-500 shadow-inner animate-pulse"
+      >
+        <i class="fa-solid fa-link-slash text-4xl"></i>
+      </div>
+      <h2 class="text-2xl font-bold text-slate-800 mb-2">ลิงก์ไม่ถูกต้อง</h2>
+      <p class="text-slate-500 mb-6">กรุณาสแกน QR Code ใหม่</p>
+    </div>
+
+    <script>
+      let sessionToken = "<?= token ?>";
+
+      window.onload = function () {
+        if (!sessionToken || sessionToken === "") {
+          document.getElementById("errorPanel").classList.remove("hidden");
+          return;
+        }
+
+        // 1. ตรวจสอบว่าเครื่องนี้เคยเช็คชื่อใน Token นี้ไปหรือยัง?
+        const alreadyChecked = localStorage.getItem(
+          "CHECKED_IN_" + sessionToken
+        );
+        if (alreadyChecked) {
+          document.getElementById("checkInPanel").classList.remove("hidden");
+          // ล็อกหน้าจอทันทีถ้าเคยเช็คแล้ว
+          lockUIAsSuccess("อุปกรณ์นี้ได้ทำการเช็คชื่อแล้ว");
+          return;
+        }
+
+        document.getElementById("checkInPanel").classList.remove("hidden");
+      };
+
+      function getLocationAndSubmit() {
+        const input = document.getElementById("studentId");
+        const stdId = input.value.trim();
+        const btn = document.getElementById("btnCheck");
+        const resultArea = document.getElementById("resultArea");
+
+        if (!stdId) {
+          input.classList.add("shake-hard");
+          input.focus();
+          setTimeout(() => input.classList.remove("shake-hard"), 400);
+          return;
+        }
+
+        // 2. Loading State (จัดกึ่งกลาง + Spinner)
+        btn.disabled = true;
+        btn.classList.add("cursor-not-allowed", "opacity-80");
+        btn.innerHTML = `
+        <div class="flex items-center justify-center gap-3 w-full">
+            <i class="fa-solid fa-circle-notch fa-spin text-xl"></i>
+            <span>กำลังตรวจสอบ...</span>
+        </div>
+      `;
+
+        resultArea.classList.add("hidden");
+
+        if (!navigator.geolocation) {
+          showResult(false, "GPS Error", "อุปกรณ์ไม่รองรับ GPS");
+          resetButton(btn);
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            google.script.run
+              .withSuccessHandler((res) => {
+                if (res.success) {
+                  // 3. บันทึกลงเครื่องว่าเช็คแล้ว (ป้องกันการใช้เครื่องเดิมเช็คให้เพื่อน)
+                  localStorage.setItem("CHECKED_IN_" + sessionToken, "true");
+
+                  if (res.already) {
+                    // กรณี Server บอกว่าเช็คไปแล้ว (อาจจะใช้เครื่องอื่นเช็ค ID นี้)
+                    showResult(
+                      true,
+                      "เช็คชื่อไปแล้ว",
+                      "คุณได้ทำการเช็คชื่อไปก่อนหน้านี้"
+                    );
+                    lockUIAsSuccess("เช็คชื่อแล้ว");
+                  } else {
+                    // เช็คชื่อสำเร็จครั้งแรก
+                    triggerConfetti();
+                    showResult(
+                      true,
+                      "เช็คชื่อสำเร็จ!",
+                      "บันทึกเวลาเรียบร้อยแล้ว"
+                    );
+                    lockUIAsSuccess("เรียบร้อย");
+                  }
+                } else {
+                  showResult(false, "เกิดข้อผิดพลาด", res.msg);
+                  resetButton(btn);
+                }
+              })
+              .checkInStudent(
+                stdId,
+                pos.coords.latitude,
+                pos.coords.longitude,
+                sessionToken
+              );
+          },
+          (err) => {
+            let msg = "ระบุตำแหน่งไม่ได้";
+            if (err.code == 1) msg = "กรุณากด 'อนุญาต' (Allow) GPS";
+            showResult(false, "GPS Error", msg);
+            resetButton(btn);
+          },
+          { enableHighAccuracy: true }
+        );
+      }
+
+      // ฟังก์ชันล็อกหน้าจอเมื่อสำเร็จ
+      function lockUIAsSuccess(btnText) {
+        const btn = document.getElementById("btnCheck");
+        const input = document.getElementById("studentId");
+
+        btn.disabled = true;
+        btn.innerHTML = `
+            <div class="flex items-center justify-center gap-2 w-full">
+                <i class="fa-solid fa-circle-check"></i> 
+                <span>${btnText}</span>
+            </div>`;
+        btn.classList.replace("bg-indigo-600", "bg-green-500");
+        btn.classList.replace("shadow-indigo-500/40", "shadow-green-500/40");
+
+        input.disabled = true;
+        input.classList.add("bg-slate-100", "text-slate-400");
+      }
+
+      function resetButton(btn) {
+        btn.disabled = false;
+        btn.classList.remove("cursor-not-allowed", "opacity-80");
+        btn.innerHTML = `
+            <div class="relative flex items-center justify-center gap-3 text-lg w-full">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>ลองใหม่อีกครั้ง</span>
+            </div>`;
+      }
+
+      function showResult(success, title, msg) {
+        const area = document.getElementById("resultArea");
+        const card = document.getElementById("resultCard");
+        const wrapper = document.getElementById("iconStatusWrapper");
+        const icon = document.getElementById("iconStatus");
+        const h3 = document.getElementById("msgTitle");
+        const p = document.getElementById("msgDetail");
+
+        area.classList.remove("hidden");
+
+        if (success) {
+          card.className =
+            "p-6 rounded-2xl border-2 border-green-100 bg-green-50/50 flex flex-col items-center text-center gap-2 animate-entry";
+          wrapper.className =
+            "w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center mb-1 text-white shadow-lg shadow-green-200";
+          icon.className = "fa-solid fa-check text-3xl";
+          h3.className = "font-bold text-xl text-green-700";
+          p.className = "text-sm text-green-600/80 font-medium";
+        } else {
+          card.className =
+            "p-6 rounded-2xl border-2 border-red-100 bg-red-50/50 flex flex-col items-center text-center gap-2 animate-entry";
+          wrapper.className =
+            "w-16 h-16 rounded-full bg-gradient-to-br from-red-400 to-rose-500 flex items-center justify-center mb-1 text-white shadow-lg shadow-red-200";
+          icon.className = "fa-solid fa-xmark text-3xl";
+          h3.className = "font-bold text-xl text-red-700";
+          p.className = "text-sm text-red-600/80 font-medium";
+          if (navigator.vibrate) navigator.vibrate(200);
+        }
+        h3.innerText = title;
+        p.innerText = msg;
+      }
+
+      function triggerConfetti() {
+        var duration = 3000;
+        var end = Date.now() + duration;
+        var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+        var interval = setInterval(function () {
+          var timeLeft = end - Date.now();
+          if (timeLeft <= 0) return clearInterval(interval);
+          var particleCount = 50 * (timeLeft / duration);
+          confetti(
+            Object.assign({}, defaults, {
+              particleCount,
+              origin: { x: Math.random() * 0.2 + 0.1, y: Math.random() - 0.2 },
+            })
+          );
+          confetti(
+            Object.assign({}, defaults, {
+              particleCount,
+              origin: { x: Math.random() * 0.2 + 0.7, y: Math.random() - 0.2 },
+            })
+          );
+        }, 250);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <base target="_top" />
+  <!-- เพิ่ม viewport เพื่อให้รองรับมือถือ -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+  <style>
+    /* ปรับให้ Scroll ได้บนมือถือ แต่ล็อกบนจอใหญ่ */
+    body {
+      font-family: "Kanit", sans-serif;
+      background-color: #f8fafc;
+    }
+
+    /* Desktop Only Styles */
+    @media (min-width: 1024px) {
+      body {
+        overflow: hidden;
+      }
+    }
+
+    .glass-header {
+      background: linear-gradient(135deg, #4f46e5, #9333ea);
+      box-shadow: 0 4px 20px rgba(79, 70, 229, 0.2);
+    }
+
+    .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.2);
+      font-weight: 600;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    /* Common UI */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+      color: white;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+    }
+
+    .choices {
+      margin-bottom: 0;
+      /* ลบ margin default */
+      font-family: "Kanit", sans-serif;
+    }
+
+    /* กล่อง Input หลัก */
+    .choices__inner {
+      background-color: #f8fafc !important;
+      /* bg-slate-50 */
+      border: 1px solid #e2e8f0 !important;
+      /* border-slate-200 */
+      border-radius: 0.75rem !important;
+      /* rounded-xl */
+      padding: 0.5rem 1rem !important;
+      /* py-2 px-4 */
+      min-height: 46px !important;
+      /* ความสูงใกล้เคียง input ปกติ */
+      display: flex !important;
+      align-items: center !important;
+      font-size: 0.875rem !important;
+      /* text-sm */
+    }
+
+    /* ตอนกด Focus (มีเงาสีม่วง) */
+    .is-focused .choices__inner {
+      border-color: #6366f1 !important;
+      /* indigo-500 */
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+      /* ring */
+    }
+
+    /* กล่อง Dropdown รายการ */
+    .choices {
+      margin-bottom: 0;
+      font-family: "Kanit", sans-serif;
+      position: relative;
+    }
+
+    .choices__inner {
+      background-color: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 0.5rem 1rem !important;
+      min-height: 46px !important;
+      display: flex !important;
+      align-items: center !important;
+      font-size: 0.875rem !important;
+    }
+
+    .is-focused .choices__inner {
+      border-color: #6366f1 !important;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+    }
+
+    /* --- [แก้ไข] ให้ List อยู่ด้านบน (Drop Up) --- */
+    .choices__list--dropdown,
+    .choices__list[aria-expanded] {
+      background-color: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      box-shadow: 0 -10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+      /* เงาชี้ขึ้น */
+
+      /* ดันขึ้นไปข้างบน */
+      bottom: 100% !important;
+      top: auto !important;
+      margin-bottom: 8px !important;
+      margin-top: 0 !important;
+
+      z-index: 50 !important;
+    }
+
+    .choices__input {
+      background-color: #f1f5f9 !important;
+      border-radius: 0.5rem !important;
+      margin-bottom: 5px !important;
+    }
+
+    .choices__list--dropdown .choices__item {
+      padding: 10px 16px !important;
+      font-size: 0.875rem !important;
+    }
+
+    .choices__list--dropdown .choices__item--selectable.is-highlighted {
+      background-color: #e0e7ff !important;
+      color: #4338ca !important;
+    }
+
+    .choices[data-type*="select-one"]::after {
+      border-color: #94a3b8 transparent transparent transparent;
+      right: 1.25rem;
+    }
+
+    /* Hide scrollbar for menu */
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+</head>
+
+<body class="h-screen flex flex-col">
+  <!-- TOP NAVBAR -->
+  <nav class="glass-header text-white shadow-lg z-50 flex-none h-16 sticky top-0">
+    <div class="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-md shadow-inner border border-white/20">
+          <i class="fa-solid fa-graduation-cap text-lg"></i>
+        </div>
+        <!-- ซ่อนชื่อยาวๆ บนมือถือ -->
+        <span class="font-bold text-lg tracking-wide hidden md:block">Classroom System</span>
+        <span class="font-bold text-lg tracking-wide md:hidden">CMS</span>
+      </div>
+
+      <!-- Hamburger Button (Mobile Only) -->
+      <div class="flex items-center gap-2">
+        <!-- Active Page Name (Mobile Only) -->
+        <div class="md:hidden flex items-center gap-2">
+          <? if (activePage == 'checkin') { ?>
+           <i class="fa-solid fa-user-check text-sm"></i>
+           <span class="font-medium text-sm">เช็คชื่อ</span>
+           <? } else if (activePage == 'lab') { ?>
+            <i class="fa-solid fa-flask text-sm"></i>
+            <span class="font-medium text-sm">ตรวจแลบ</span>
+            <? } else if (activePage == 'scrum') { ?>
+              <i class="fa-solid fa-users-gear text-sm"></i>
+              <span class="font-medium text-sm">Scrum</span>
+              <? } ?>
+            </div>
+            <button onclick="toggleMobileMenu()"
+              class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10 transition">
+              <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+       </div>
+
+      <!-- Desktop Menu (Hidden on Mobile) -->
+      <div class="hidden md:flex space-x-1">
+        <a href="<?= url ?>?page=checkin"
+          class="nav-link px-3 py-2 hover:bg-white/10 transition flex items-center gap-2 text-sm whitespace-nowrap rounded-lg <?= activePage == 'checkin' ? 'active' : '' ?>">
+          <i class="fa-solid fa-user-check"></i> <span>เช็คชื่อ</span>
+        </a>
+        <a href="<?= url ?>?page=lab"
+          class="nav-link px-3 py-2 hover:bg-white/10 transition flex items-center gap-2 text-sm whitespace-nowrap rounded-lg <?= activePage == 'lab' ? 'active' : '' ?>">
+          <i class="fa-solid fa-flask"></i> <span>ตรวจแลบ</span>
+        </a>
+        <a href="<?= url ?>?page=scrum"
+          class="nav-link px-3 py-2 hover:bg-white/10 transition flex items-center gap-2 text-sm whitespace-nowrap rounded-lg <?= activePage == 'scrum' ? 'active' : '' ?>">
+          <i class="fa-solid fa-users-gear"></i> <span>Scrum</span>
+        </a>
+        <button onclick="openGroupSettingsModal()"
+          class="nav-link px-3 py-2 hover:bg-white/10 transition flex items-center gap-2 text-sm whitespace-nowrap rounded-lg border border-white/20 ml-2">
+          <i class="fa-solid fa-gear"></i> <span>ตั้งค่ากลุ่ม</span>
+        </button>
+      </div>
+
+      <!-- Session Badge -->
+      <div id="sessionBadge"
+        class="hidden flex items-center gap-2 bg-emerald-500 text-white px-3 py-1 rounded-full text-[10px] lg:text-xs font-bold shadow-lg shadow-emerald-500/30 animate-pulse border border-emerald-400/50 whitespace-nowrap">
+        LIVE-SESSION
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Sidebar Menu (Right Side) -->
+  <div id="mobileSidebar" class="md:hidden fixed inset-0 z-[100] pointer-events-none">
+    <!-- Backdrop -->
+    <div id="sidebarBackdrop"
+      class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-300"
+      onclick="toggleMobileMenu()"></div>
+
+    <!-- Sidebar -->
+    <div id="sidebarContent"
+      class="absolute right-0 top-0 bottom-0 w-64 bg-gradient-to-br from-indigo-600 to-purple-600 shadow-2xl transform translate-x-full transition-transform duration-300">
+      <!-- Header -->
+      <div class="p-4 border-b border-white/20 flex items-center justify-between">
+        <div class="flex items-center gap-3 text-white">
+          <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-md">
+            <i class="fa-solid fa-graduation-cap text-lg"></i>
+          </div>
+          <span class="font-bold text-lg">Menu</span>
+        </div>
+        <button onclick="toggleMobileMenu()"
+          class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10 transition text-white">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Menu Items -->
+      <div class="p-4 space-y-2">
+        <a href="<?= url ?>?page=checkin"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 transition <?= activePage == 'checkin' ? 'bg-white/20' : '' ?>">
+          <i class="fa-solid fa-user-check text-lg w-6"></i>
+          <span class="font-medium">เช็คชื่อ</span>
+        </a>
+        <a href="<?= url ?>?page=lab"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 transition <?= activePage == 'lab' ? 'bg-white/20' : '' ?>">
+          <i class="fa-solid fa-flask text-lg w-6"></i>
+          <span class="font-medium">ตรวจแลบ</span>
+        </a>
+        <a href="<?= url ?>?page=scrum"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 transition <?= activePage == 'scrum' ? 'bg-white/20' : '' ?>">
+          <i class="fa-solid fa-users-gear text-lg w-6"></i>
+          <span class="font-medium">Scrum</span>
+        </a>
+        <button onclick="openGroupSettingsModal(); toggleMobileMenu();"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 transition border border-white/20">
+          <i class="fa-solid fa-gear text-lg w-6"></i>
+          <span class="font-medium">ตั้งค่ากลุ่ม</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- CONTENT AREA -->
+  <!-- ปรับให้รองรับ Scroll บนมือถือ -->
+  <div class="flex-1 relative bg-slate-50 overflow-y-auto lg:overflow-hidden w-full">
+    <? if (activePage == 'checkin') { ?>
+    <?!= include('PageCheckIn'); ?>
+    <? } else if (activePage == 'lab') { ?>
+    <?!= include('PageLab'); ?>
+    <? } else if (activePage == 'scrum') { ?>
+    <?!= include('PageScrum'); ?>
+    <? } else { ?>
+    <div class="p-10 text-center text-red-500">
+      Page not found:
+      <?= activePage ?>
+    </div>
+    <? } ?>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div id="confirmModal"
+    class="hidden fixed inset-0 z-[50] flex items-center justify-center modal-hide transition-all duration-300 p-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md modal-backdrop" onclick="closeConfirmModal()"></div>
+    <div
+      class="bg-white rounded-[24px] shadow-2xl w-full max-w-sm p-6 relative flex flex-col items-center text-center border border-white/50 modal-content">
+      <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4 text-3xl" id="confirmIconWrapper">
+        <i id="confirmIcon"></i>
+      </div>
+      <h3 class="text-xl font-bold text-slate-800 mb-2" id="confirmTitle">
+        Title
+      </h3>
+      <div id="confirmBody" class="text-slate-500 text-sm mb-6 w-full break-words">
+        Details
+      </div>
+      <div class="grid grid-cols-2 gap-3 w-full">
+        <button type="button" onclick="closeConfirmModal()"
+          class="py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm font-bold text-slate-600 transition">
+          ยกเลิก
+        </button>
+        <button type="button" id="btnConfirmAction"
+          class="py-2.5 rounded-xl text-sm font-bold text-white shadow-lg transition transform active:scale-95">
+          ยืนยัน
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Group Settings Modal -->
+  <div id="groupSettingsModal"
+    class="hidden fixed inset-0 z-[40] flex items-center justify-center modal-hide transition-all duration-300 p-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md modal-backdrop" onclick="closeGroupSettingsModal()">
+    </div>
+    <div
+      class="bg-white rounded-[32px] shadow-2xl w-full max-w-2xl max-h-[90vh] relative flex flex-col border border-white/50 modal-content overflow-hidden">
+      <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white shadow-md">
+            <i class="fa-solid fa-gear"></i>
+          </div>
+          จัดการกลุ่มเรียน
+        </h3>
+        <button type="button" onclick="closeGroupSettingsModal()"
+          class="w-10 h-10 bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-full flex items-center justify-center transition shadow-sm">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-6">
+        <!-- Header -->
+        <div class="flex items-center gap-2 mb-4 text-indigo-500 text-xs font-bold uppercase tracking-wider">
+          <i class="fa-solid fa-sliders"></i> การตั้งค่ากลุ่มเรียน
+        </div>
+
+        <!-- Add New Group Form -->
+        <div class="bg-white/50 p-4 rounded-2xl border border-slate-100 shadow-sm mb-6">
+          <div class="space-y-3">
+            <div>
+              <label class="text-[10px] text-slate-400 font-bold ml-1 uppercase">ชื่อกลุ่มเรียน</label>
+              <input type="text" id="newGroupName" placeholder="Ex. CS101 Section 1"
+                class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition" />
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-400 font-bold ml-1 uppercase">Spreadsheet ID</label>
+              <input type="text" id="newSheetId" placeholder="1xXx... (ID จาก URL)"
+                class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono focus:ring-2 focus:ring-indigo-500 outline-none transition" />
+            </div>
+            <input type="hidden" id="editingGroupIndex" value="">
+            <div class="flex gap-2">
+              <button type="button" id="btnSaveGroup" onclick="saveOrUpdateGroup()"
+                class="flex-1 btn-primary flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm">
+                <i class="fa-solid fa-plus" id="btnIcon"></i>
+                <span id="btnText">บันทึกกลุ่ม</span>
+              </button>
+              <button type="button" id="btnCancelEdit" onclick="cancelEdit()"
+                class="hidden px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-bold transition">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Group List Header -->
+          <div
+            class="mt-6 mb-3 text-xs font-bold text-slate-400 uppercase tracking-wider flex justify-between items-center">
+            <span>รายการทั้งหมด
+            </span>
+            <span class="bg-slate-200 text-slate-500 px-2 py-0.5 rounded-md text-[10px]" id="groupCount">0</span>
+          </div>
+
+          <!-- Group List -->
+          <ul id="groupList" class="space-y-2 pb-4"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container (ย้ายมาไว้ที่นี่เพื่อให้แสดงทับทุกหน้า) -->
+    <div id="toast-container" class="fixed top-20 right-5 z-[9999] pointer-events-none flex flex-col items-end gap-2">
+    </div>
+
+    <script>
+      // Global Toast Function
+      function showToast(msg, type = "success") {
+        const t = document.createElement("div");
+        t.className = `bg-white border-l-4 ${type === "success" ? "border-emerald-500" : "border-rose-500"
+          } p-4 rounded-xl shadow-xl flex items-center gap-3 transform translate-x-full transition-transform duration-300 pointer-events-auto min-w-[300px]`;
+        t.innerHTML = `<i class="fa-solid ${type === "success"
+            ? "fa-circle-check text-emerald-500"
+            : "fa-circle-xmark text-rose-500"
+          } text-xl"></i><div><h4 class="font-bold text-slate-800 text-sm">${type === "success" ? "สำเร็จ" : "ข้อผิดพลาด"
+          }</h4><p class="text-xs text-slate-500">${msg}</p></div>`;
+        document.getElementById("toast-container").appendChild(t);
+        setTimeout(() => t.classList.remove("translate-x-full"), 10);
+        setTimeout(() => {
+          t.classList.add("translate-x-full");
+          setTimeout(() => t.remove(), 300);
+        }, 3000);
+      }
+
+      // Mobile Menu Toggle
+      function toggleMobileMenu() {
+        const sidebar = document.getElementById("mobileSidebar");
+        const backdrop = document.getElementById("sidebarBackdrop");
+        const content = document.getElementById("sidebarContent");
+
+        if (sidebar.classList.contains("pointer-events-none")) {
+          // Open
+          sidebar.classList.remove("pointer-events-none");
+          backdrop.classList.remove("opacity-0");
+          backdrop.classList.add("opacity-100", "pointer-events-auto");
+          content.classList.remove("translate-x-full");
+          content.classList.add("translate-x-0");
+        } else {
+          // Close
+          backdrop.classList.remove("opacity-100", "pointer-events-auto");
+          backdrop.classList.add("opacity-0");
+          content.classList.remove("translate-x-0");
+          content.classList.add("translate-x-full");
+          setTimeout(() => {
+            sidebar.classList.add("pointer-events-none");
+          }, 300);
+        }
+      }
+
+      // Group Settings Modal Functions
+      function openGroupSettingsModal() {
+        loadGroups(); // โหลดข้อมูลกลุ่มเรียน
+        const modal = document.getElementById("groupSettingsModal");
+        modal.classList.remove("hidden");
+        setTimeout(() => {
+          modal.classList.remove("modal-hide");
+          modal.classList.add("modal-show");
+        }, 10);
+      }
+
+      function closeGroupSettingsModal() {
+        const modal = document.getElementById("groupSettingsModal");
+        modal.classList.remove("modal-show");
+        modal.classList.add("modal-hide");
+        setTimeout(() => modal.classList.add("hidden"), 300);
+      }
+
+      // Edit Modal Functions - ไม่ใช้แล้ว (ใช้ inline edit แทน)
+      let currentGroupsData = [];
+
+      // Confirm Delete
+      function confirmDeleteGroup(index, callback) {
+        showConfirm(
+          "ลบกลุ่มเรียน ?",
+          "ข้อมูลกลุ่มนี้จะหายไปจากรายการ",
+          "fa-solid fa-trash",
+          "bg-rose-100 text-rose-500",
+          "bg-rose-500 hover:bg-rose-600",
+          callback
+        );
+      }
+
+      function showConfirm(title, body, iconClass, iconBg, btnClass, callback) {
+        document.getElementById("confirmTitle").innerText = title;
+        document.getElementById("confirmBody").innerHTML = body;
+        const iconWrapper = document.getElementById("confirmIconWrapper");
+        iconWrapper.className = `w-16 h-16 rounded-full flex items-center justify-center mb-4 text-3xl ${iconBg}`;
+        document.getElementById("confirmIcon").className = iconClass;
+        const btn = document.getElementById("btnConfirmAction");
+        btn.className = `py-2.5 rounded-xl text-sm font-bold text-white shadow-lg transition transform active:scale-95 ${btnClass}`;
+        btn.onclick = () => {
+          callback();
+          closeConfirmModal();
+        };
+
+        const modal = document.getElementById("confirmModal");
+        modal.classList.remove("hidden");
+        setTimeout(() => {
+          modal.classList.remove("modal-hide");
+          modal.classList.add("modal-show");
+        }, 10);
+      }
+
+      function closeConfirmModal() {
+        const modal = document.getElementById("confirmModal");
+        modal.classList.remove("modal-show");
+        modal.classList.add("modal-hide");
+        setTimeout(() => modal.classList.add("hidden"), 300);
+      }
+
+      // Callback when groups updated
+      function onGroupsUpdated(data) {
+        currentGroupsData = data;
+        // Dispatch event to all pages
+        const event = new CustomEvent("groupsUpdated", { detail: data });
+        window.dispatchEvent(event);
+      }
+
+      // Group Management Functions
+      function loadGroups() {
+        google.script.run.withSuccessHandler(renderGroups).getGroups();
+      }
+
+      function renderGroups(data) {
+        currentGroupsData = data;
+        const list = document.getElementById("groupList");
+        document.getElementById("groupCount").innerText = data.length;
+        list.innerHTML = "";
+
+        data.forEach((g, i) => {
+          list.innerHTML += `
+            <li class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm group hover:border-indigo-300 transition mb-2">
+              <div class="flex items-center gap-3 overflow-hidden cursor-pointer w-full" onclick="editGroupByIndex(${i})">
+                <div class="bg-indigo-50 text-indigo-600 w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition group-hover:bg-indigo-600 group-hover:text-white group-hover:shadow-md">
+                  <i class="fa-solid fa-pen"></i>
+                </div>
+                <div class="flex flex-col truncate">
+                  <span class="text-sm font-bold text-slate-700 truncate group-hover:text-indigo-600 transition">${g.name
+            }</span>
+                  <span class="text-[10px] text-slate-400 font-mono truncate">ID: ${g.id.substring(
+              0,
+              8
+            )}...</span>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                onclick="confirmDeleteGroup(${i}, () => deleteGroupByIndex(${i}))" 
+                class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition ml-2"
+              >
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </li>
+          `;
+        });
+
+        onGroupsUpdated(data);
+      }
+
+      function addGroup() {
+        const name = document.getElementById("newGroupName").value;
+        const id = document.getElementById("newSheetId").value;
+
+        if (!name || !id) {
+          showToast("กรุณากรอกข้อมูลให้ครบ", "error");
+          return;
+        }
+
+        google.script.run
+          .withSuccessHandler((res) => {
+            if (res.success) {
+              renderGroups(res.data);
+              document.getElementById("newGroupName").value = "";
+              document.getElementById("newSheetId").value = "";
+              showToast("บันทึกกลุ่มเรียบร้อย");
+            } else {
+              showToast(res.msg, "error");
+            }
+          })
+          .saveGroup(name, id);
+      }
+
+      function saveOrUpdateGroup() {
+        const editingIndex = document.getElementById("editingGroupIndex").value;
+
+        if (editingIndex !== "") {
+          // โหมดแก้ไข
+          updateGroup();
+        } else {
+          // โหมดเพิ่มใหม่
+          addGroup();
+        }
+      }
+
+      function updateGroup() {
+        const name = document.getElementById("newGroupName").value;
+        const id = document.getElementById("newSheetId").value;
+        const index = document.getElementById("editingGroupIndex").value;
+
+        if (!name || !id) {
+          showToast("กรุณากรอกข้อมูลให้ครบ", "error");
+          return;
+        }
+
+        google.script.run
+          .withSuccessHandler((res) => {
+            if (res.success) {
+              renderGroups(res.data);
+              cancelEdit();
+              showToast("แก้ไขข้อมูลเรียบร้อย");
+            } else {
+              showToast(res.msg, "error");
+            }
+          })
+          .updateGroup(parseInt(index), name, id);
+      }
+
+      function editGroupByIndex(index) {
+        if (currentGroupsData && currentGroupsData[index]) {
+          editGroup(index, currentGroupsData[index]);
+        }
+      }
+
+      function editGroup(index, groupData) {
+        // ใส่ข้อมูลลงใน input
+        document.getElementById("newGroupName").value = groupData.name;
+        document.getElementById("newSheetId").value = groupData.id;
+        document.getElementById("editingGroupIndex").value = index;
+
+        // เปลี่ยนปุ่มเป็นโหมดแก้ไข
+        document.getElementById("btnIcon").className = "fa-solid fa-pen-to-square";
+        document.getElementById("btnText").innerText = "อัปเดตกลุ่ม";
+        document.getElementById("btnCancelEdit").classList.remove("hidden");
+
+        // Scroll ไปที่ฟอร์ม
+        document.getElementById("newGroupName").focus();
+      }
+
+      function cancelEdit() {
+        // ล้างข้อมูล
+        document.getElementById("newGroupName").value = "";
+        document.getElementById("newSheetId").value = "";
+        document.getElementById("editingGroupIndex").value = "";
+
+        // เปลี่ยนปุ่มกลับเป็นโหมดเพิ่ม
+        document.getElementById("btnIcon").className = "fa-solid fa-plus";
+        document.getElementById("btnText").innerText = "บันทึกกลุ่ม";
+        document.getElementById("btnCancelEdit").classList.add("hidden");
+      }
+
+      function deleteGroupByIndex(index) {
+        google.script.run
+          .withSuccessHandler((res) => {
+            if (res.success) {
+              renderGroups(res.data);
+              showToast("ลบข้อมูลเรียบร้อย");
+            }
+          })
+          .deleteGroup(index);
+      }
+
+      // Modal styles
+      const modalStyles = `
+        .modal-backdrop {
+          transition: opacity 0.3s ease-out;
+        }
+        .modal-content {
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-show .modal-backdrop {
+          opacity: 1;
+          pointer-events: auto;
+        }
+        .modal-show .modal-content {
+          transform: scale(1);
+          opacity: 1;
+        }
+        .modal-hide .modal-backdrop {
+          opacity: 0;
+          pointer-events: none;
+        }
+        .modal-hide .modal-content {
+          transform: scale(0.95);
+          opacity: 0;
+        }
+      `;
+      const styleSheet = document.createElement("style");
+      styleSheet.textContent = modalStyles;
+      document.head.appendChild(styleSheet);
+    </script>
+</body>
+
+</html>
