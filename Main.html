@@ -20,6 +20,10 @@
       background-color: #f8fafc;
     }
 
+    .warning-bar {
+      display: none !important;
+    }
+    
     /* Desktop Only Styles */
     @media (min-width: 1024px) {
       body {
@@ -200,7 +204,10 @@
             <? } else if (activePage == 'scrum') { ?>
               <i class="fa-solid fa-users-gear text-sm"></i>
               <span class="font-medium text-sm">Scrum</span>
-              <? } ?>
+              <? } else if (activePage == 'project') { ?>
+                <i class="fa-solid fa-clipboard-check text-sm"></i>
+                <span class="font-medium text-sm">Project Review</span>
+                <? } ?>
             </div>
             <button onclick="toggleMobileMenu()"
               class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10 transition">
@@ -221,6 +228,10 @@
         <a href="<?= url ?>?page=scrum"
           class="nav-link px-3 py-2 hover:bg-white/10 transition flex items-center gap-2 text-sm whitespace-nowrap rounded-lg <?= activePage == 'scrum' ? 'active' : '' ?>">
           <i class="fa-solid fa-users-gear"></i> <span>Scrum</span>
+        </a>
+        <a href="<?= url ?>?page=project"
+          class="nav-link px-3 py-2 hover:bg-white/10 transition flex items-center gap-2 text-sm whitespace-nowrap rounded-lg <?= activePage == 'project' ? 'active' : '' ?>">
+          <i class="fa-solid fa-clipboard-check"></i> <span>Project Review</span>
         </a>
         <button onclick="openGroupSettingsModal()"
           class="nav-link px-3 py-2 hover:bg-white/10 transition flex items-center gap-2 text-sm whitespace-nowrap rounded-lg border border-white/20 ml-2">
@@ -277,6 +288,11 @@
           <i class="fa-solid fa-users-gear text-lg w-6"></i>
           <span class="font-medium">Scrum</span>
         </a>
+        <a href="<?= url ?>?page=project"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 transition <?= activePage == 'project' ? 'bg-white/20' : '' ?>">
+          <i class="fa-solid fa-clipboard-check text-lg w-6"></i>
+          <span class="font-medium">Project Review</span>
+        </a>
         <button onclick="openGroupSettingsModal(); toggleMobileMenu();"
           class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 transition border border-white/20">
           <i class="fa-solid fa-gear text-lg w-6"></i>
@@ -296,6 +312,8 @@
     <?!= include('PageLab'); ?>
     <? } else if (activePage == 'scrum') { ?>
     <?!= include('PageScrum'); ?>
+    <? } else if (activePage == 'project') { ?>
+    <?!= include('PageProjectReview'); ?>
     <? } else { ?>
     <div class="p-10 text-center text-red-500">
       Page not found:
@@ -335,11 +353,11 @@
   <!-- Group Settings Modal -->
   <div id="groupSettingsModal"
     class="hidden fixed inset-0 z-[40] flex items-center justify-center modal-hide transition-all duration-300 p-4">
-    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md modal-backdrop" onclick="closeGroupSettingsModal()">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md modal-backdrop">
     </div>
     <div
       class="bg-white rounded-[32px] shadow-2xl w-full max-w-2xl max-h-[90vh] relative flex flex-col border border-white/50 modal-content overflow-hidden">
-      <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+      <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-slate-50 to-slate-100">
         <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
           <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white shadow-md">
             <i class="fa-solid fa-gear"></i>
@@ -565,8 +583,23 @@
           return;
         }
 
+        const btn = document.getElementById("btnSaveGroup");
+        btn.disabled = true;
+        btn.innerHTML = `
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-circle-notch fa-spin animate-spin"></i>
+            <span>กำลังบันทึก...</span>
+          </div>
+        `;
+
         google.script.run
           .withSuccessHandler((res) => {
+            btn.disabled = false;
+            btn.innerHTML = `
+              <i class="fa-solid fa-plus" id="btnIcon"></i>
+              <span id="btnText">บันทึกกลุ่ม</span>
+            `;
+            
             if (res.success) {
               renderGroups(res.data);
               document.getElementById("newGroupName").value = "";
@@ -601,8 +634,23 @@
           return;
         }
 
+        const btn = document.getElementById("btnSaveGroup");
+        btn.disabled = true;
+        btn.innerHTML = `
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-circle-notch fa-spin animate-spin"></i>
+            <span>กำลังบันทึก...</span>
+          </div>
+        `;
+
         google.script.run
           .withSuccessHandler((res) => {
+            btn.disabled = false;
+            btn.innerHTML = `
+              <i class="fa-solid fa-pen-to-square" id="btnIcon"></i>
+              <span id="btnText">อัปเดตกลุ่ม</span>
+            `;
+            
             if (res.success) {
               renderGroups(res.data);
               cancelEdit();

@@ -1,0 +1,1059 @@
+<style>
+  @keyframes entry {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-entry {
+    animation: entry 0.4s ease-out;
+  }
+
+  /* Toast Notification */
+  #toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    pointer-events: none;
+    width: 90%;
+    max-width: 350px;
+  }
+
+  .toast {
+    background: white;
+    border-left: 4px solid #4f46e5;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    transform: translateX(120%);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    pointer-events: auto;
+    width: 100%;
+  }
+
+  .toast.show {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .toast.success {
+    border-color: #10b981;
+  }
+
+  .toast.error {
+    border-color: #ef4444;
+  }
+
+  /* Simple Checkbox Styling */
+  .checkbox-item {
+    transition: background-color 0.2s ease;
+  }
+
+  .checkbox-item:hover {
+    background: #f8fafc;
+  }
+
+  .checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #4f46e5;
+  }
+
+  /* Progress Bar */
+  .progress-bar {
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: #4f46e5;
+    transition: width 0.3s ease;
+    border-radius: 999px;
+  }
+
+  /* Modal Animation */
+  .modal-backdrop {
+    transition: opacity 0.3s ease-out;
+  }
+
+  .modal-content {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .modal-show .modal-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal-show .modal-content {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  .modal-hide .modal-backdrop {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .modal-hide .modal-content {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+</style>
+
+<div id="toast-container"></div>
+
+<div class="flex flex-col lg:flex-row h-auto lg:h-full w-full p-4 gap-4">
+  <!-- LEFT SIDEBAR: Control Panel -->
+  <aside
+    class="w-full lg:w-80 glass-panel shadow-xl flex flex-col rounded-[24px] overflow-hidden shrink-0 h-auto lg:h-full order-2 lg:order-1"
+  >
+    <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
+      <!-- Header -->
+      <div
+        class="flex items-center gap-2 mb-5 text-indigo-500 text-xs font-bold uppercase tracking-wider"
+      >
+        <i class="fa-solid fa-clipboard-check"></i> Project Review
+      </div>
+
+      <!-- 1. Group Selection -->
+      <div class="space-y-4 mb-6">
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 ml-1 uppercase"
+            >เลือกกลุ่มเรียน</label
+          >
+          <div class="relative mt-1">
+            <select
+              id="projectGroupSelect"
+              onchange="loadProjectData()"
+              class="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer shadow-sm text-slate-700 font-medium"
+            >
+              <option value="">-- กรุณาเลือก --</option>
+            </select>
+            <div
+              class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400"
+            >
+              <i class="fa-solid fa-chevron-down text-xs"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- STATS CARDS SECTION - Order 1 on mobile, show with main on desktop -->
+  <div class="w-full lg:hidden order-1">
+    <div
+      class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 animate-entry"
+      style="animation-delay: 0.1s"
+    >
+      <!-- Card Total -->
+      <div
+        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-indigo-300 transition-all duration-300"
+      >
+        <div
+          class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-indigo-50/50 to-transparent"
+        ></div>
+        <div class="relative z-10">
+          <p
+            class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1"
+          >
+            นักศึกษาทั้งหมด
+          </p>
+          <h3 id="dashTotal" class="text-4xl font-bold text-slate-700">0</h3>
+        </div>
+        <div
+          class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-500 shadow-sm group-hover:scale-110 transition duration-300"
+        >
+          <i class="fa-solid fa-users text-xl"></i>
+        </div>
+      </div>
+
+      <!-- Card Reviewed -->
+      <div
+        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-emerald-300 transition-all duration-300"
+      >
+        <div
+          class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-emerald-50/50 to-transparent"
+        ></div>
+        <div class="relative z-10">
+          <p
+            class="text-emerald-500 text-[10px] font-bold uppercase tracking-wider mb-1"
+          >
+            ตรวจแล้ว
+          </p>
+          <h3 id="dashReviewed" class="text-4xl font-bold text-emerald-600">
+            0
+          </h3>
+        </div>
+        <div
+          class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm group-hover:scale-110 transition duration-300"
+        >
+          <i class="fa-solid fa-clipboard-check text-xl"></i>
+        </div>
+      </div>
+
+      <!-- Card Not Reviewed -->
+      <div
+        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-rose-300 transition-all duration-300"
+      >
+        <div
+          class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-rose-50/50 to-transparent"
+        ></div>
+        <div class="relative z-10">
+          <p
+            class="text-rose-500 text-[10px] font-bold uppercase tracking-wider mb-1"
+          >
+            ยังไม่ตรวจ
+          </p>
+          <h3 id="dashNotReviewed" class="text-4xl font-bold text-rose-600">
+            0
+          </h3>
+        </div>
+        <div
+          class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 shadow-sm group-hover:scale-110 transition duration-300"
+        >
+          <i class="fa-solid fa-clipboard-question text-xl"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT MAIN CONTENT: Dashboard - Order 3 on mobile, order 2 on desktop -->
+  <main
+    class="w-full lg:flex-1 overflow-visible lg:overflow-y-auto pl-0 lg:pl-0 order-3 lg:order-2"
+  >
+    <!-- Stats Cards - Show only on desktop -->
+    <div
+      class="hidden lg:grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 animate-entry"
+      style="animation-delay: 0.1s"
+    >
+      <!-- Card Total -->
+      <div
+        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-indigo-300 transition-all duration-300"
+      >
+        <div
+          class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-indigo-50/50 to-transparent"
+        ></div>
+        <div class="relative z-10">
+          <p
+            class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1"
+          >
+            นักศึกษาทั้งหมด
+          </p>
+          <h3 id="dashTotal2" class="text-4xl font-bold text-slate-700">0</h3>
+        </div>
+        <div
+          class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-500 shadow-sm group-hover:scale-110 transition duration-300"
+        >
+          <i class="fa-solid fa-users text-xl"></i>
+        </div>
+      </div>
+
+      <!-- Card Reviewed -->
+      <div
+        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-emerald-300 transition-all duration-300"
+      >
+        <div
+          class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-emerald-50/50 to-transparent"
+        ></div>
+        <div class="relative z-10">
+          <p
+            class="text-emerald-500 text-[10px] font-bold uppercase tracking-wider mb-1"
+          >
+            ตรวจแล้ว
+          </p>
+          <h3 id="dashReviewed2" class="text-4xl font-bold text-emerald-600">
+            0
+          </h3>
+        </div>
+        <div
+          class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm group-hover:scale-110 transition duration-300"
+        >
+          <i class="fa-solid fa-clipboard-check text-xl"></i>
+        </div>
+      </div>
+
+      <!-- Card Not Reviewed -->
+      <div
+        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-rose-300 transition-all duration-300"
+      >
+        <div
+          class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-rose-50/50 to-transparent"
+        ></div>
+        <div class="relative z-10">
+          <p
+            class="text-rose-500 text-[10px] font-bold uppercase tracking-wider mb-1"
+          >
+            ยังไม่ตรวจ
+          </p>
+          <h3 id="dashNotReviewed2" class="text-4xl font-bold text-rose-600">
+            0
+          </h3>
+        </div>
+        <div
+          class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 shadow-sm group-hover:scale-110 transition duration-300"
+        >
+          <i class="fa-solid fa-clipboard-question text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Table -->
+    <div
+      class="glass-panel rounded-[24px] h-[500px] lg:h-[calc(100%-140px)] flex flex-col overflow-hidden relative shadow-xl animate-entry mb-4 lg:mb-0"
+      style="animation-delay: 0.2s"
+    >
+      <div
+        class="p-5 border-b border-slate-100 flex justify-between items-center bg-white/60 backdrop-blur-md sticky top-0 z-10"
+      >
+        <h3 class="font-bold text-slate-700 flex items-center gap-3 text-lg">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-600 p-2 rounded-lg text-white shadow-md shadow-indigo-500/20"
+          >
+            <i class="fa-solid fa-list-check ml-1"></i>
+          </div>
+          รายชื่อนักศึกษา
+        </h3>
+        <div class="flex items-center gap-2">
+          <button
+            onclick="refreshProjectTable()"
+            class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-indigo-600 transition"
+          >
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto student-list bg-white/40">
+        <table class="w-full text-left border-collapse">
+          <thead
+            class="bg-slate-50/80 text-slate-400 text-[10px] font-bold uppercase sticky top-0 z-10 backdrop-blur-sm shadow-sm"
+          >
+            <tr>
+              <th class="p-4 w-12 text-center">#</th>
+              <th class="p-4 w-28 lg:w-32">รหัสนักศึกษา</th>
+              <th class="p-4">ชื่อ-นามสกุล</th>
+              <th class="p-4 text-center w-32 lg:w-40">สถานะ</th>
+            </tr>
+          </thead>
+          <tbody
+            id="projectTableBody"
+            class="text-sm text-slate-600 divide-y divide-slate-100 bg-white/60"
+          >
+            <tr>
+              <td colspan="4" class="p-20 text-center text-slate-400 italic">
+                <div class="flex flex-col items-center gap-4 opacity-60">
+                  <i
+                    class="fa-solid fa-clipboard-question text-6xl text-slate-300"
+                  ></i>
+                  <span>กรุณาเลือกกลุ่มเรียนทางด้านซ้าย</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Review Modal -->
+<div
+  id="reviewModal"
+  class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-hide transition-all duration-300"
+>
+  <div
+    class="absolute inset-0 bg-slate-900/70 backdrop-blur-md modal-backdrop"
+    onclick="closeReviewModal()"
+  ></div>
+  <div
+    class="modal-content bg-white rounded-[28px] shadow-2xl w-full max-w-3xl relative flex flex-col border border-white/50 max-h-[90vh] overflow-hidden"
+  >
+    <!-- Modal Header - Simple & Clean -->
+    <div
+      class="relative bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200"
+    >
+      <div class="p-6">
+        <button
+          type="button"
+          onclick="closeReviewModal()"
+          class="absolute top-4 right-4 w-10 h-10 bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-full flex items-center justify-center transition shadow-sm"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="flex items-center gap-4 mb-4">
+          <div
+            class="w-14 h-14 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 border border-indigo-100"
+          >
+            <i class="fa-solid fa-user-graduate text-xl"></i>
+          </div>
+          <div class="flex-1">
+            <h2 class="text-xl font-bold text-slate-800" id="modalStudentName">
+              Student Name
+            </h2>
+            <p
+              class="text-sm text-slate-500 font-medium flex items-center gap-2"
+              id="modalStudentID"
+            >
+              <i class="fa-solid fa-id-card text-xs"></i>
+              Student ID
+            </p>
+          </div>
+        </div>
+
+        <!-- Progress Bar - Minimal -->
+        <div class="bg-white rounded-lg p-3 border border-slate-200">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-semibold text-slate-600"
+              >ความคืบหน้า</span
+            >
+            <span class="text-xs font-bold text-indigo-600" id="progressText"
+              >0/10</span
+            >
+          </div>
+          <div class="progress-bar bg-slate-100">
+            <div
+              class="progress-fill bg-indigo-600"
+              id="progressFill"
+              style="width: 0%; box-shadow: none"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Body - Scrollable -->
+    <div class="flex-1 overflow-y-auto p-6 bg-white">
+      <div class="space-y-4">
+        <!-- Section 1: Sprint 1 -->
+        <div
+          class="bg-slate-50 rounded-xl p-4 border border-slate-200 hover:border-slate-300 transition-all"
+        >
+          <div class="flex items-center gap-3 mb-3">
+            <div
+              class="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center text-slate-700 font-bold text-sm"
+            >
+              1
+            </div>
+            <h3 class="text-base font-bold text-slate-700">
+              ระบบย่อย Sprint 1
+            </h3>
+          </div>
+          <div class="space-y-2">
+            <label
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                id="check_1_1"
+                onchange="updateProgress()"
+                class="mt-0.5"
+              />
+              <label
+                for="check_1_1"
+                class="text-sm text-slate-600 cursor-pointer flex-1"
+              >
+                โปรแกรมทำงานตรงกับการออกแบบระบบ
+              </label>
+            </label>
+            <label
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                id="check_1_2"
+                onchange="updateProgress()"
+                class="mt-0.5"
+              />
+              <label
+                for="check_1_2"
+                class="text-sm text-slate-600 cursor-pointer flex-1"
+              >
+                ตรวจสอบว่าโครงสร้าง Database ใน SQLite เป็นไปตามที่กำหนด
+              </label>
+            </label>
+            <label
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                id="check_1_3"
+                onchange="updateProgress()"
+                class="mt-0.5"
+              />
+              <label
+                for="check_1_3"
+                class="text-sm text-slate-600 cursor-pointer flex-1"
+              >
+                ตรวจสอบว่าข้อมูลสามารถ Insert, Update, Delete และ Query
+                ได้อย่างถูกต้อง
+              </label>
+            </label>
+          </div>
+        </div>
+
+        <!-- Section 2: Sprint 2 -->
+        <div
+          class="bg-slate-50 rounded-xl p-4 border border-slate-200 hover:border-slate-300 transition-all"
+        >
+          <div class="flex items-center gap-3 mb-3">
+            <div
+              class="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center text-slate-700 font-bold text-sm"
+            >
+              2
+            </div>
+            <h3 class="text-base font-bold text-slate-700">
+              ระบบย่อย Sprint 2
+            </h3>
+          </div>
+          <div class="space-y-2">
+            <label
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                id="check_2_1"
+                onchange="updateProgress()"
+                class="mt-0.5"
+              />
+              <label
+                for="check_2_1"
+                class="text-sm text-slate-600 cursor-pointer flex-1"
+              >
+                โปรแกรมทำงานตรงกับการออกแบบระบบ
+              </label>
+            </label>
+            <label
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                id="check_2_2"
+                onchange="updateProgress()"
+                class="mt-0.5"
+              />
+              <label
+                for="check_2_2"
+                class="text-sm text-slate-600 cursor-pointer flex-1"
+              >
+                ตรวจสอบว่าโครงสร้าง Database ใน SQLite เป็นไปตามที่กำหนด
+              </label>
+            </label>
+            <label
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                id="check_2_3"
+                onchange="updateProgress()"
+                class="mt-0.5"
+              />
+              <label
+                for="check_2_3"
+                class="text-sm text-slate-600 cursor-pointer flex-1"
+              >
+                ตรวจสอบว่าข้อมูลสามารถ Insert, Update, Delete และ Query
+                ได้อย่างถูกต้อง
+              </label>
+            </label>
+          </div>
+        </div>
+
+        <!-- Section 3: Unit Test -->
+        <div
+          class="bg-slate-50 rounded-xl p-4 border border-slate-200 hover:border-slate-300 transition-all"
+        >
+          <div class="flex items-center gap-3 mb-3">
+            <div
+              class="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center text-slate-700 font-bold text-sm"
+            >
+              3
+            </div>
+            <h3 class="text-base font-bold text-slate-700">
+              Unit Test ของ Entity หลัก
+            </h3>
+          </div>
+          <div class="space-y-2">
+            <label
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                id="check_3_1"
+                onchange="updateProgress()"
+                class="mt-0.5"
+              />
+              <label
+                for="check_3_1"
+                class="text-sm text-slate-600 cursor-pointer flex-1"
+              >
+                กรณีการทดสอบระบบแบบ Positive (1 กรณี)
+              </label>
+            </label>
+            <label
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                id="check_3_2"
+                onchange="updateProgress()"
+                class="mt-0.5"
+              />
+              <label
+                for="check_3_2"
+                class="text-sm text-slate-600 cursor-pointer flex-1"
+              >
+                กรณีการทดสอบระบบแบบ Negative (3 กรณี)
+              </label>
+            </label>
+          </div>
+        </div>
+
+        <!-- Section 4: UAT (Selenium) -->
+        <div
+          class="bg-slate-50 rounded-xl p-4 border border-slate-200 hover:border-slate-300 transition-all"
+        >
+          <div class="flex items-center gap-3 mb-3">
+            <div
+              class="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center text-slate-700 font-bold text-sm"
+            >
+              4
+            </div>
+            <h3 class="text-base font-bold text-slate-700">
+              UAT (Selenium) ของ Entity หลัก
+            </h3>
+          </div>
+          <div class="space-y-2">
+            <label
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                id="check_4_1"
+                onchange="updateProgress()"
+                class="mt-0.5"
+              />
+              <label
+                for="check_4_1"
+                class="text-sm text-slate-600 cursor-pointer flex-1"
+              >
+                กรณีการทดสอบระบบแบบ Positive (1 กรณี)
+              </label>
+            </label>
+            <label
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                id="check_4_2"
+                onchange="updateProgress()"
+                class="mt-0.5"
+              />
+              <label
+                for="check_4_2"
+                class="text-sm text-slate-600 cursor-pointer flex-1"
+              >
+                กรณีการทดสอบระบบแบบ Negative (3 กรณี)
+              </label>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer - Clean -->
+      <div class="p-5">
+        <div class="flex gap-3">
+          <button
+            type="button"
+            onclick="closeReviewModal()"
+            class="flex-1 py-3.5 hover:bg-slate-50 text-slate-600 rounded-lg text-sm bg-slate-100 mt-6 font-semibold transition hover:border-slate-400"
+          >
+            <i class="fa-solid fa-xmark mr-1.5"></i>
+            ยกเลิก
+          </button>
+          <button
+            type="button"
+            onclick="submitReview()"
+            id="btnSubmitReview"
+            class="flex-1 btn-primary py-3.5 rounded-xl text-base font-bold flex items-center justify-center gap-2 mt-6 shadow-lg shadow-indigo-500/20 active:scale-95 transition-transform"
+          >
+            <i class="fa-solid fa-floppy-disk"></i>
+            บันทึกข้อมูล
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let projectGroups = [];
+    let allProjectStudents = [];
+    let currentStudentId = null;
+    let currentSheetId = null;
+
+    // Initial Load
+    (function () {
+      google.script.run
+        .withSuccessHandler((data) => {
+          projectGroups = data;
+          const select = document.getElementById("projectGroupSelect");
+          data.forEach((g, i) => {
+            let opt = document.createElement("option");
+            opt.value = i;
+            opt.text = g.name;
+            select.appendChild(opt);
+          });
+        })
+        .getGroups();
+    })();
+
+    // Load Project Data
+    function loadProjectData() {
+      const idx = document.getElementById("projectGroupSelect").value;
+      resetDashboard();
+
+      if (idx === "") return;
+
+      const group = projectGroups[idx];
+      currentSheetId = group.id;
+
+      const tbody = document.getElementById("projectTableBody");
+      tbody.innerHTML = `
+      <tr>
+        <td colspan="4" class="text-center py-20 text-slate-400">
+          <div class="flex flex-col items-center gap-3">
+            <div class="relative">
+              <div class="w-12 h-12 border-4 border-indigo-200 rounded-full"></div>
+              <div class="w-12 h-12 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin absolute top-0 left-0"></div>
+            </div>
+            <p class="text-sm font-medium">กำลังโหลดข้อมูล...</p>
+          </div>
+        </td>
+      </tr>
+    `;
+
+      google.script.run
+        .withSuccessHandler((res) => {
+          if (res.success) {
+            allProjectStudents = res.students;
+            renderProjectTable(res.students);
+          } else {
+            showToast(res.msg, "error");
+            resetDashboard();
+          }
+        })
+        .getProjectReviewData(group.id);
+    }
+
+    // Render Table
+    function renderProjectTable(students) {
+      const tbody = document.getElementById("projectTableBody");
+
+      if (!students || students.length === 0) {
+        tbody.innerHTML =
+          '<tr><td colspan="4" class="p-12 text-center text-slate-400 italic">ไม่พบรายชื่อนักศึกษา</td></tr>';
+        return;
+      }
+
+      let html = "";
+      let reviewedCount = 0;
+      let notReviewedCount = 0;
+
+      students.forEach((std, i) => {
+        const isReviewed = std.reviewed;
+        if (isReviewed) reviewedCount++;
+        else notReviewedCount++;
+
+        const statusBadge = isReviewed
+          ? `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 shadow-sm"><i class="fa-solid fa-check mr-1"></i> ตรวจแล้ว</span>`
+          : `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-500 border border-rose-100">ยังไม่ตรวจ</span>`;
+
+        const rowClass = isReviewed
+          ? "bg-emerald-50/40"
+          : "hover:bg-indigo-50/50 cursor-pointer group";
+        const idClass = isReviewed
+          ? "text-indigo-600 font-bold"
+          : "text-slate-500";
+
+        html += `<tr class="border-b border-slate-50 last:border-0 transition ${rowClass}" onclick="openReviewModal('${
+          std.id
+        }', '${std.name}')">
+                <td class="p-4 text-slate-400 font-mono text-xs text-center">${
+                  i + 1
+                }</td>
+                <td class="p-4 font-mono ${idClass}">${std.id}</td>
+                <td class="p-4 font-medium text-slate-700">${std.name}</td>
+                <td class="p-4 text-center">${statusBadge}</td>
+            </tr>`;
+      });
+
+      tbody.innerHTML = html;
+
+      // Update Stats (both mobile and desktop cards)
+      animateValue(
+        "dashTotal",
+        parseInt(document.getElementById("dashTotal").innerText),
+        students.length,
+        500
+      );
+      animateValue(
+        "dashReviewed",
+        parseInt(document.getElementById("dashReviewed").innerText),
+        reviewedCount,
+        500
+      );
+      animateValue(
+        "dashNotReviewed",
+        parseInt(document.getElementById("dashNotReviewed").innerText),
+        notReviewedCount,
+        500
+      );
+
+      // Update desktop cards (if exists)
+      const dashTotal2 = document.getElementById("dashTotal2");
+      const dashReviewed2 = document.getElementById("dashReviewed2");
+      const dashNotReviewed2 = document.getElementById("dashNotReviewed2");
+
+      if (dashTotal2) {
+        animateValue(
+          "dashTotal2",
+          parseInt(dashTotal2.innerText),
+          students.length,
+          500
+        );
+      }
+      if (dashReviewed2) {
+        animateValue(
+          "dashReviewed2",
+          parseInt(dashReviewed2.innerText),
+          reviewedCount,
+          500
+        );
+      }
+      if (dashNotReviewed2) {
+        animateValue(
+          "dashNotReviewed2",
+          parseInt(dashNotReviewed2.innerText),
+          notReviewedCount,
+          500
+        );
+      }
+    }
+
+    // Open Review Modal
+    function openReviewModal(studentId, studentName) {
+      currentStudentId = studentId;
+      document.getElementById("modalStudentName").innerText = studentName;
+      document.getElementById("modalStudentID").innerText = studentId;
+
+      // Reset all checkboxes
+      for (let i = 1; i <= 4; i++) {
+        for (let j = 1; j <= 3; j++) {
+          const checkbox = document.getElementById(`check_${i}_${j}`);
+          if (checkbox) checkbox.checked = false;
+        }
+      }
+
+      // Load existing data
+      const student = allProjectStudents.find((s) => s.id === studentId);
+      if (student && student.checkboxes) {
+        student.checkboxes.forEach((checked, index) => {
+          const checkboxId = getCheckboxId(index);
+          const checkbox = document.getElementById(checkboxId);
+          if (checkbox) checkbox.checked = checked;
+        });
+      }
+
+      // Update progress bar
+      updateProgress();
+
+      // Show modal
+      const modal = document.getElementById("reviewModal");
+      modal.classList.remove("hidden");
+      setTimeout(() => {
+        modal.classList.remove("modal-hide");
+        modal.classList.add("modal-show");
+      }, 10);
+    }
+
+    // Close Review Modal
+    function closeReviewModal() {
+      const modal = document.getElementById("reviewModal");
+      modal.classList.remove("modal-show");
+      modal.classList.add("modal-hide");
+      setTimeout(() => {
+        modal.classList.add("hidden");
+      }, 300);
+      currentStudentId = null;
+    }
+
+    // Get Checkbox ID from index
+    function getCheckboxId(index) {
+      const mapping = [
+        "check_1_1",
+        "check_1_2",
+        "check_1_3",
+        "check_2_1",
+        "check_2_2",
+        "check_2_3",
+        "check_3_1",
+        "check_3_2",
+        "check_4_1",
+        "check_4_2",
+      ];
+      return mapping[index];
+    }
+
+    // Update Progress Bar
+    function updateProgress() {
+      const checkboxIds = [
+        "check_1_1",
+        "check_1_2",
+        "check_1_3",
+        "check_2_1",
+        "check_2_2",
+        "check_2_3",
+        "check_3_1",
+        "check_3_2",
+        "check_4_1",
+        "check_4_2",
+      ];
+
+      let checkedCount = 0;
+      checkboxIds.forEach((id) => {
+        const checkbox = document.getElementById(id);
+        if (checkbox && checkbox.checked) {
+          checkedCount++;
+        }
+      });
+
+      const total = checkboxIds.length;
+      const percentage = (checkedCount / total) * 100;
+
+      // Update progress bar
+      const progressFill = document.getElementById("progressFill");
+      const progressText = document.getElementById("progressText");
+
+      if (progressFill) {
+        progressFill.style.width = percentage + "%";
+      }
+
+      if (progressText) {
+        progressText.innerText = `${checkedCount}/${total}`;
+      }
+    }
+
+    // Submit Review
+    function submitReview() {
+      if (!currentStudentId || !currentSheetId) return;
+
+      // Collect checkbox values
+      const checkboxValues = [];
+      const checkboxIds = [
+        "check_1_1",
+        "check_1_2",
+        "check_1_3",
+        "check_2_1",
+        "check_2_2",
+        "check_2_3",
+        "check_3_1",
+        "check_3_2",
+        "check_4_1",
+        "check_4_2",
+      ];
+
+      checkboxIds.forEach((id) => {
+        const checkbox = document.getElementById(id);
+        checkboxValues.push(checkbox ? checkbox.checked : false);
+      });
+
+      const btn = document.getElementById("btnSubmitReview");
+      btn.disabled = true;
+      btn.innerHTML =
+        '<i class="fa-solid fa-circle-notch fa-spin"></i> กำลังบันทึก...';
+
+      google.script.run
+        .withSuccessHandler((res) => {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> บันทึก';
+
+          if (res.success) {
+            showToast("บันทึกข้อมูลเรียบร้อย", "success");
+            closeReviewModal();
+            loadProjectData(); // Refresh table
+          } else {
+            showToast(res.msg, "error");
+          }
+        })
+        .saveProjectReview(currentSheetId, currentStudentId, checkboxValues);
+    }
+
+    // Refresh Table
+    function refreshProjectTable() {
+      const icon = event.currentTarget.querySelector("i");
+      icon.classList.add("fa-spin");
+      loadProjectData();
+      setTimeout(() => icon.classList.remove("fa-spin"), 1000);
+    }
+
+    // Reset Dashboard
+    function resetDashboard() {
+      document.getElementById("projectTableBody").innerHTML =
+        '<tr><td colspan="4" class="p-20 text-center text-slate-400 italic"><div class="flex flex-col items-center gap-4 opacity-60"><i class="fa-solid fa-clipboard-question text-6xl text-slate-300"></i><span>กรุณาเลือกกลุ่มเรียน</span></div></td></tr>';
+      document.getElementById("dashTotal").innerText = "0";
+      document.getElementById("dashReviewed").innerText = "0";
+      document.getElementById("dashNotReviewed").innerText = "0";
+    }
+
+    // Toast Notification
+    function showToast(msg, type = "success") {
+      const t = document.createElement("div");
+      t.className = `toast ${type}`;
+      t.innerHTML = `<i class="fa-solid ${
+        type === "success"
+          ? "fa-circle-check text-emerald-500"
+          : "fa-circle-xmark text-rose-500"
+      } text-xl"></i><div><h4 class="font-bold text-slate-800 text-sm">${
+        type === "success" ? "สำเร็จ" : "ข้อผิดพลาด"
+      }</h4><p class="text-xs text-slate-500">${msg}</p></div>`;
+      document.getElementById("toast-container").appendChild(t);
+      setTimeout(() => t.classList.add("show"), 10);
+      setTimeout(() => {
+        t.classList.remove("show");
+        setTimeout(() => t.remove(), 300);
+      }, 3000);
+    }
+
+    // Animate Value
+    function animateValue(id, s, e, d) {
+      if (s === e) return;
+      const obj = document.getElementById(id);
+      let start = null;
+      const step = (t) => {
+        if (!start) start = t;
+        const p = Math.min((t - start) / d, 1);
+        obj.innerHTML = Math.floor(p * (e - s) + s);
+        if (p < 1) window.requestAnimationFrame(step);
+      };
+      window.requestAnimationFrame(step);
+    }
+  </script>
+</div>

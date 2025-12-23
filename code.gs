@@ -135,11 +135,22 @@ function getDashboardData(sheetId, week, type) {
       validStudentCount++;
       let status = "Absent";
       let displayTime = "-";
-      if (checkVal == 1 || checkVal === "1") {
+
+      // ตรวจสอบค่าคะแนน
+      const scoreValue = parseFloat(checkVal);
+
+      if (scoreValue === 0.5) {
+        // มาสาย (0.5 คะแนน) - นับเป็น Present แต่แสดงสถานะเป็น Late
+        presentCount++;
+        status = "Late";
+        displayTime = checkTime ? checkTime : "Checked";
+      } else if (scoreValue === 1 || checkVal == 1 || checkVal === "1") {
+        // มาเรียน (1 คะแนน)
         presentCount++;
         status = "Present";
         displayTime = checkTime ? checkTime : "Checked";
       }
+
       studentList.push({
         id: id,
         name: name,
@@ -293,7 +304,7 @@ function checkInStudent(studentId, userLat, userLng, clientToken) {
   }
 }
 
-function adminManualCheckIn(sheetId, week, type, studentId) {
+function adminManualCheckIn(sheetId, week, type, studentId, status, score) {
   try {
     const ss = SpreadsheetApp.openById(sheetId);
     const attSheet = ss.getSheetByName("Attendance");
@@ -308,9 +319,14 @@ function adminManualCheckIn(sheetId, week, type, studentId) {
     const targetRow = 5 + idx;
     const colIndex = 6 + (parseInt(week) - 1) * 2 + (type === "Lab" ? 1 : 0);
     const cell = attSheet.getRange(targetRow, colIndex);
+
+    // สร้าง timeString พร้อมสถานะ
+    const statusLabel = status === "Late" ? "มาสาย" : "มาเรียน";
     const timeString =
-      Utilities.formatDate(new Date(), "GMT+7", "HH:mm:ss") + " (Admin)";
-    cell.setValue(1);
+      Utilities.formatDate(new Date(), "GMT+7", "HH:mm:ss") + ` (Admin)`;
+
+    // ใช้ค่า score ที่ส่งมา (0.5 สำหรับมาสาย, 1 สำหรับมาเรียน)
+    cell.setValue(score);
     cell.setNote(timeString);
     const name = attSheet.getRange(targetRow, 3).getValue();
     return { success: true, name: name };
@@ -489,6 +505,52 @@ function getLabStats(sheetId, colIndex) {
 // -----------------------------------------------------------
 
 /**
+ * ดึงรายการ Scrum Meeting จาก Sheet "Scrum"
+ * อ่านจาก Row 2 (F2, H2, J2, ...) ที่เป็น Scrum Meeting #1, #2, #3, ...
+ */
+function getScrumMeetings(groupIndex) {
+  try {
+    const groups = getGroups();
+    if (groupIndex < 0 || groupIndex >= groups.length) {
+      throw new Error("ไม่พบกลุ่มเรียน");
+    }
+
+    const group = groups[groupIndex];
+    const ss = SpreadsheetApp.openById(group.id);
+    const scrumSheet = ss.getSheetByName("Scrum");
+
+    if (!scrumSheet) {
+      throw new Error("ไม่พบ Sheet ชื่อ 'Scrum'");
+    }
+
+    // อ่านแถวที่ 2 (header ของ Scrum Meetings)
+    const headerRow = scrumSheet
+      .getRange(2, 1, 1, scrumSheet.getLastColumn())
+      .getDisplayValues()[0];
+    const meetings = [];
+
+    // เริ่มจาก column F (index 5) และข้ามทีละ 2 columns (F, H, J, L, ...)
+    for (let col = 5; col < headerRow.length; col += 2) {
+      const meetingName = String(headerRow[col]).trim();
+
+      // ตรวจสอบว่าเป็น Scrum Meeting หรือไม่
+      if (meetingName && meetingName.includes("Scrum Meeting")) {
+        meetings.push({
+          name: meetingName,
+          columnIndex: col, // เก็บ index ของ column (0-based)
+        });
+      }
+    }
+
+    return meetings;
+  } catch (e) {
+    throw new Error(
+      "เกิดข้อผิดพลาดในการดึงข้อมูล Scrum Meetings: " + e.message
+    );
+  }
+}
+
+/**
  * ดึงรายการกลุ่มนักศึกษา (Team) จาก Sheet "Team"
  */
 function getScrumTeams(groupIndex) {
@@ -506,20 +568,18 @@ function getScrumTeams(groupIndex) {
       throw new Error("ไม่พบ Sheet ชื่อ 'Team'");
     }
 
-    const data = teamSheet.getDataRange().getValues();
+    const data = teamSheet.getDataRange().getDisplayValues();
     const teams = [];
     const teamNumbers = new Set();
 
     // อ่านข้อมูลจากแถวที่ 2 เป็นต้นไป (แถว 1 เป็น header)
     for (let i = 1; i < data.length; i++) {
-      const teamNumber = data[i][0]; // Column A (index 0)
-      const advisor = data[i][11]; // Column L (index 11)
+      const teamNumber = String(data[i][0] || "").trim(); // Column A
 
       if (teamNumber && !teamNumbers.has(teamNumber)) {
         teamNumbers.add(teamNumber);
         teams.push({
-          teamNumber: String(teamNumber),
-          advisor: String(advisor || "ไม่ระบุ"),
+          teamNumber: teamNumber,
         });
       }
     }
@@ -531,9 +591,12 @@ function getScrumTeams(groupIndex) {
 }
 
 /**
- * ดึงรายชื่อนักศึกษาในกลุ่ม (Team) พร้อมคะแนน
+ * ดึงรายชื่อนักศึกษาตามกลุ่มที่เลือก พร้อมคะแนนจาก Scrum Meeting ที่เลือก
+ * @param {number} groupIndex - index ของกลุ่มเรียน
+ * @param {number} meetingColumnIndex - column index ของ Scrum Meeting (0-based)
+ * @param {string} teamNumber - เลขกลุ่มนักศึกษา เช่น "T01"
  */
-function getScrumTeamStudents(groupIndex, teamNumber) {
+function getScrumStudents(groupIndex, meetingColumnIndex, teamNumber) {
   try {
     const groups = getGroups();
     if (groupIndex < 0 || groupIndex >= groups.length) {
@@ -549,47 +612,78 @@ function getScrumTeamStudents(groupIndex, teamNumber) {
       throw new Error("ไม่พบ Sheet ชื่อ 'Team'");
     }
 
-    // ถ้ายังไม่มี Sheet Scrum ให้สร้างใหม่
-    if (!scrumSheet) {
-      const newSheet = ss.insertSheet("Scrum");
-      newSheet
-        .getRange(1, 1, 1, 4)
-        .setValues([["รหัสนักศึกษา", "ชื่อ-นามสกุล", "คะแนน 1", "คะแนน 2"]]);
-      newSheet.getRange(1, 1, 1, 4).setFontWeight("bold");
-    }
+    // อ่านข้อมูลจาก Team Sheet
+    const teamData = teamSheet.getDataRange().getDisplayValues();
 
-    const teamData = teamSheet.getDataRange().getValues();
-    const scrumData = scrumSheet ? scrumSheet.getDataRange().getValues() : [];
+    // อ่านข้อมูลจาก Scrum Sheet (ถ้ามี)
+    const scrumData = scrumSheet
+      ? scrumSheet.getDataRange().getDisplayValues()
+      : [];
 
     const students = [];
+    let currentTeamNumber = "";
     let advisor = "";
 
-    // อ่านข้อมูลนักศึกษาจาก Team Sheet
+    // อ่านข้อมูลนักศึกษาจาก Team Sheet (เริ่มจากแถวที่ 2, index 1)
     for (let i = 1; i < teamData.length; i++) {
-      const rowTeamNumber = String(teamData[i][0]);
+      // จัดการ merged cells - อ่านค่า Team Number
+      const rowTeamNumber = String(teamData[i][0] || "").trim(); // Column A
+      if (rowTeamNumber !== "") {
+        currentTeamNumber = rowTeamNumber;
+      }
 
-      if (rowTeamNumber === String(teamNumber)) {
-        const studentId = String(teamData[i][4] || ""); // Column E (index 4)
-        const firstName = String(teamData[i][5] || ""); // Column F (index 5)
-        const lastName = String(teamData[i][6] || ""); // Column G (index 6)
-        advisor = String(teamData[i][11] || "ไม่ระบุ"); // Column L (index 11)
+      // อ่านค่า Advisor
+      const advisorValue = String(teamData[i][11] || "").trim(); // Column L
+      if (advisorValue !== "") {
+        advisor = advisorValue;
+      }
 
-        if (studentId) {
+      // ถ้ามีการระบุ teamNumber ให้กรอง, ถ้าไม่มี (null/undefined/empty) ให้เอาหมด
+      if (!teamNumber || currentTeamNumber === String(teamNumber)) {
+        const studentId = String(teamData[i][4] || "").trim(); // Column E
+        const firstName = String(teamData[i][5] || "").trim(); // Column F
+        const lastName = String(teamData[i][6] || "").trim(); // Column G
+
+        // ถ้ามีรหัสนักศึกษา
+        if (studentId !== "") {
           // ค้นหาคะแนนจาก Scrum Sheet
           let score1 = null;
           let score2 = null;
 
-          for (let j = 1; j < scrumData.length; j++) {
-            if (String(scrumData[j][0]) === studentId) {
-              score1 = scrumData[j][2] !== "" ? Number(scrumData[j][2]) : null;
-              score2 = scrumData[j][3] !== "" ? Number(scrumData[j][3]) : null;
-              break;
+          if (scrumData.length > 0) {
+            // ค้นหาแถวของนักศึกษาใน Scrum Sheet
+            // เริ่มจากแถวที่ 5 (index 4) เพราะ Row 1-4 เป็น headers
+            for (let j = 4; j < scrumData.length; j++) {
+              const scrumStudentId = String(scrumData[j][1] || "").trim(); // Column B
+
+              if (scrumStudentId === studentId) {
+                // อ่านคะแนนจาก column ที่เลือก
+                // meetingColumnIndex คือ column F (index 5) สำหรับ Meeting #1
+                const score1Value = String(
+                  scrumData[j][meetingColumnIndex] || ""
+                ).trim();
+                const score2Value = String(
+                  scrumData[j][meetingColumnIndex + 1] || ""
+                ).trim();
+
+                score1 =
+                  score1Value !== "" && !isNaN(score1Value)
+                    ? Number(score1Value)
+                    : null;
+                score2 =
+                  score2Value !== "" && !isNaN(score2Value)
+                    ? Number(score2Value)
+                    : null;
+                break;
+              }
             }
           }
 
           students.push({
+            teamNumber: currentTeamNumber,
             id: studentId,
             name: `${firstName} ${lastName}`.trim(),
+            advisor: advisor,
             score1: score1,
             score2: score2,
           });
@@ -599,7 +693,7 @@ function getScrumTeamStudents(groupIndex, teamNumber) {
 
     return {
       teamNumber: String(teamNumber),
-      advisor: advisor,
+      advisor: advisor || "ไม่ระบุ",
       students: students,
     };
   } catch (e) {
@@ -610,7 +704,13 @@ function getScrumTeamStudents(groupIndex, teamNumber) {
 /**
  * บันทึกคะแนน Scrum
  */
-function saveScrumScore(groupIndex, teamNumber, studentId, score1, score2) {
+function saveScrumScore(
+  groupIndex,
+  meetingColumnIndex,
+  studentId,
+  score1,
+  score2
+) {
   try {
     const groups = getGroups();
     if (groupIndex < 0 || groupIndex >= groups.length) {
@@ -619,52 +719,147 @@ function saveScrumScore(groupIndex, teamNumber, studentId, score1, score2) {
 
     const group = groups[groupIndex];
     const ss = SpreadsheetApp.openById(group.id);
-    let scrumSheet = ss.getSheetByName("Scrum");
+    const scrumSheet = ss.getSheetByName("Scrum");
 
-    // ถ้ายังไม่มี Sheet Scrum ให้สร้างใหม่
     if (!scrumSheet) {
-      scrumSheet = ss.insertSheet("Scrum");
-      scrumSheet
-        .getRange(1, 1, 1, 4)
-        .setValues([["รหัสนักศึกษา", "ชื่อ-นามสกุล", "คะแนน 1", "คะแนน 2"]]);
-      scrumSheet.getRange(1, 1, 1, 4).setFontWeight("bold");
+      throw new Error("ไม่พบ Sheet ชื่อ 'Scrum'");
     }
 
-    // ดึงข้อมูลนักศึกษาจาก Team Sheet
-    const teamSheet = ss.getSheetByName("Team");
-    const teamData = teamSheet.getDataRange().getValues();
+    // อ่านข้อมูลทั้งหมด
+    const data = scrumSheet.getDataRange().getDisplayValues();
 
-    let studentName = "";
-    for (let i = 1; i < teamData.length; i++) {
-      if (String(teamData[i][4]) === String(studentId)) {
-        const firstName = String(teamData[i][5] || "");
-        const lastName = String(teamData[i][6] || "");
-        studentName = `${firstName} ${lastName}`.trim();
+    // ค้นหาแถวของนักศึกษา (เริ่มจากแถวที่ 5, index 4)
+    let targetRow = -1;
+    for (let row = 4; row < data.length; row++) {
+      const currentStudentId = String(data[row][1] || "").trim(); // Column B
+      if (currentStudentId === String(studentId)) {
+        targetRow = row + 1; // +1 เพราะ Sheet เริ่มที่ 1
         break;
       }
     }
 
-    // ค้นหาแถวที่มีรหัสนักศึกษานี้อยู่แล้ว
-    const scrumData = scrumSheet.getDataRange().getValues();
-    let rowIndex = -1;
-
-    for (let i = 1; i < scrumData.length; i++) {
-      if (String(scrumData[i][0]) === String(studentId)) {
-        rowIndex = i + 1; // +1 เพราะ getRange เริ่มที่ 1
-        break;
-      }
+    if (targetRow === -1) {
+      throw new Error("ไม่พบนักศึกษารหัส: " + studentId);
     }
 
-    // ถ้าเจอแล้ว ให้อัปเดต ถ้าไม่เจอให้เพิ่มแถวใหม่
-    if (rowIndex > 0) {
-      scrumSheet.getRange(rowIndex, 3).setValue(score1);
-      scrumSheet.getRange(rowIndex, 4).setValue(score2);
-    } else {
-      scrumSheet.appendRow([studentId, studentName, score1, score2]);
-    }
+    // บันทึกคะแนนลง column ที่ถูกต้อง
+    // meetingColumnIndex เป็น 0-based, ต้อง +1 สำหรับ getRange
+    const scoreCol1 = meetingColumnIndex + 1; // Column F, H, J, ...
+    const scoreCol2 = meetingColumnIndex + 2; // Column G, I, K, ...
+
+    scrumSheet.getRange(targetRow, scoreCol1).setValue(score1);
+    scrumSheet.getRange(targetRow, scoreCol2).setValue(score2);
 
     return { success: true };
   } catch (e) {
     throw new Error("เกิดข้อผิดพลาดในการบันทึกคะแนน: " + e.message);
+  }
+}
+
+// -----------------------------------------------------------
+// 8. PROJECT REVIEW SYSTEM
+// -----------------------------------------------------------
+
+/**
+ * ดึงข้อมูลนักศึกษาจาก Sheet "Project Review"
+ * อ่านจาก B5 (รหัสนักศึกษา) และ C5 (ชื่อ)
+ * พร้อมตรวจสอบสถานะว่าตรวจแล้วหรือยัง (จาก E5-N5)
+ */
+function getProjectReviewData(sheetId) {
+  try {
+    const ss = SpreadsheetApp.openById(sheetId);
+    const sheet = ss.getSheetByName("Project Review");
+
+    if (!sheet) {
+      return { success: false, msg: "ไม่พบ Sheet 'Project Review'" };
+    }
+
+    const lastRow = sheet.getLastRow();
+
+    if (lastRow < 5) {
+      return { success: true, students: [] };
+    }
+
+    // ดึงข้อมูลนักศึกษา (B5:C และ E:N สำหรับ checkbox data)
+    const studentData = sheet.getRange(5, 2, lastRow - 4, 2).getValues(); // B5:C (column 2,3)
+    const checkboxData = sheet.getRange(5, 5, lastRow - 4, 10).getValues(); // E5:N (10 columns)
+
+    const students = [];
+
+    for (let i = 0; i < studentData.length; i++) {
+      const id = String(studentData[i][0]).trim();
+      const name = String(studentData[i][1]).trim();
+
+      if (id === "" || name === "") continue;
+
+      // ตรวจสอบว่ามีข้อมูล checkbox หรือไม่ (ถ้ามีอย่างน้อย 1 ช่อง = ตรวจแล้ว)
+      const checkboxes = checkboxData[i];
+      const hasAnyCheckbox = checkboxes.some(
+        (val) => val === true || val === "TRUE" || val === 1
+      );
+
+      students.push({
+        id: id,
+        name: name,
+        reviewed: hasAnyCheckbox,
+        checkboxes: checkboxes.map(
+          (val) => val === true || val === "TRUE" || val === 1
+        ),
+      });
+    }
+
+    return { success: true, students: students };
+  } catch (e) {
+    return { success: false, msg: "Error: " + e.message };
+  }
+}
+
+/**
+ * บันทึกข้อมูล Project Review
+ * @param {string} sheetId - ID ของ Spreadsheet
+ * @param {string} studentId - รหัสนักศึกษา
+ * @param {Array<boolean>} checkboxValues - Array ของค่า checkbox (10 ตัว)
+ */
+function saveProjectReview(sheetId, studentId, checkboxValues) {
+  try {
+    const ss = SpreadsheetApp.openById(sheetId);
+    const sheet = ss.getSheetByName("Project Review");
+
+    if (!sheet) {
+      return { success: false, msg: "ไม่พบ Sheet 'Project Review'" };
+    }
+
+    const lastRow = sheet.getLastRow();
+
+    if (lastRow < 5) {
+      return { success: false, msg: "ไม่พบข้อมูลนักศึกษา" };
+    }
+
+    // ค้นหาแถวของนักศึกษา (จากคอลัมน์ B)
+    const ids = sheet
+      .getRange(5, 2, lastRow - 4, 1)
+      .getValues()
+      .flat()
+      .map(String);
+
+    const idx = ids.indexOf(String(studentId));
+
+    if (idx === -1) {
+      return { success: false, msg: "ไม่พบรหัสนักศึกษา: " + studentId };
+    }
+
+    const targetRow = 5 + idx;
+
+    // บันทึกค่า checkbox ลง E:N (10 columns)
+    // ถ้า checkbox เป็น true ให้ส่ง 1, ถ้าเป็น false ไม่ต้องส่งอะไร (ค่าว่าง)
+    for (let i = 0; i < checkboxValues.length && i < 10; i++) {
+      const col = 5 + i; // Column E = 5, F = 6, ..., N = 14
+      const value = checkboxValues[i] ? 1 : "";
+      sheet.getRange(targetRow, col).setValue(value);
+    }
+
+    return { success: true };
+  } catch (e) {
+    return { success: false, msg: "Error: " + e.message };
   }
 }

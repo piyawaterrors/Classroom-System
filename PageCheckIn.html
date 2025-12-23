@@ -1,208 +1,223 @@
 <style>
-  /* ปรับ body ให้ scroll ได้บนมือถือ แต่ hidden บนจอใหญ่ */
-  body {
-    font-family: "Kanit", sans-serif;
-    background-color: #f8fafc;
-  }
-
-  @media (min-width: 1024px) {
+    /* ปรับ body ให้ scroll ได้บนมือถือ แต่ hidden บนจอใหญ่ */
     body {
-      overflow: hidden;
-    }
-  }
-
-  /* UI Styles */
-  .glass-panel {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
-  }
-
-  .glass-header {
-    background: linear-gradient(120deg, #4f46e5, #9333ea);
-    box-shadow: 0 4px 20px rgba(79, 70, 229, 0.2);
-  }
-
-  /* Buttons */
-  .btn-primary {
-    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
-    transition: all 0.3s ease;
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
-  }
-
-  .btn-primary:active {
-    transform: translateY(0);
-  }
-
-  .btn-danger {
-    background: linear-gradient(135deg, #ef4444 0%, #f43f5e 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-    transition: all 0.3s ease;
-  }
-
-  .btn-danger:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
-  }
-
-  .btn-secondary {
-    background: #f1f5f9;
-    color: #475569;
-    transition: all 0.2s ease;
-  }
-
-  .btn-secondary:hover {
-    background: #e2e8f0;
-  }
-
-  /* Modal Animation */
-  .modal-backdrop {
-    transition: opacity 0.3s ease-out;
-  }
-
-  .modal-content {
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .modal-show .modal-backdrop {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .modal-show .modal-content {
-    transform: scale(1);
-    opacity: 1;
-  }
-
-  .modal-hide .modal-backdrop {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .modal-hide .modal-content {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-
-  /* Toast Notification */
-  #toast-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 9999;
-    pointer-events: none;
-    width: 90%;
-    max-width: 350px;
-  }
-
-  .toast {
-    background: white;
-    border-left: 4px solid #4f46e5;
-    padding: 16px 24px;
-    border-radius: 12px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    margin-bottom: 10px;
-    transform: translateX(120%);
-    opacity: 0;
-    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    pointer-events: auto;
-    width: 100%;
-  }
-
-  .toast.show {
-    transform: translateX(0);
-    opacity: 1;
-  }
-
-  .toast.success {
-    border-color: #10b981;
-  }
-
-  .toast.error {
-    border-color: #ef4444;
-  }
-
-  /* Scrollbar & Animations */
-  ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
-  }
-
-  .animate-entry {
-    animation: slideUp 0.5s ease-out forwards;
-    opacity: 0;
-  }
-
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
+        font-family: "Kanit", sans-serif;
+        background-color: #f8fafc;
     }
 
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .blob {
-    position: absolute;
-    filter: blur(80px);
-    opacity: 0.4;
-    z-index: -1;
-    animation: float 10s infinite ease-in-out;
-  }
-
-  @keyframes float {
-
-    0%,
-    100% {
-      transform: translate(0, 0);
+    @media (min-width: 1024px) {
+        body {
+            overflow: hidden;
+        }
     }
 
-    50% {
-      transform: translate(20px, -20px);
+    /* UI Styles */
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
     }
-  }
 
-  .blob-1 {
-    top: -20%;
-    left: -20%;
-    width: 500px;
-    height: 500px;
-    background: #818cf8;
-  }
+    .glass-header {
+        background: linear-gradient(120deg, #4f46e5, #9333ea);
+        box-shadow: 0 4px 20px rgba(79, 70, 229, 0.2);
+    }
 
-  .blob-2 {
-    bottom: -20%;
-    right: -20%;
-    width: 400px;
-    height: 400px;
-    background: #c084fc;
-    animation-delay: 2s;
-  }
+    /* Buttons */
+    .btn-primary {
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #f43f5e 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-secondary {
+        background: #f1f5f9;
+        color: #475569;
+        transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+    /* Modal Animation */
+    .modal-backdrop {
+        transition: opacity 0.3s ease-out;
+    }
+
+    .modal-content {
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-show .modal-backdrop {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .modal-show .modal-content {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .modal-hide .modal-backdrop {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .modal-hide .modal-content {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    /* Toast Notification */
+    #toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        pointer-events: none;
+        width: 90%;
+        max-width: 350px;
+    }
+
+    .toast {
+        background: white;
+        border-left: 4px solid #4f46e5;
+        padding: 16px 24px;
+        border-radius: 12px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+        transform: translateX(120%);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        pointer-events: auto;
+        width: 100%;
+    }
+
+    .toast.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .toast.success {
+        border-color: #10b981;
+    }
+
+    .toast.error {
+        border-color: #ef4444;
+    }
+
+    /* Scrollbar & Animations */
+    ::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+
+    .animate-entry {
+        animation: slideUp 0.5s ease-out forwards;
+        opacity: 0;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .blob {
+        position: absolute;
+        filter: blur(80px);
+        opacity: 0.4;
+        z-index: -1;
+        animation: float 10s infinite ease-in-out;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translate(0, 0);
+        }
+
+        50% {
+            transform: translate(20px, -20px);
+        }
+    }
+
+    .blob-1 {
+        top: -20%;
+        left: -20%;
+        width: 500px;
+        height: 500px;
+        background: #818cf8;
+    }
+
+    .blob-2 {
+        bottom: -20%;
+        right: -20%;
+        width: 400px;
+        height: 400px;
+        background: #c084fc;
+        animation-delay: 2s;
+    }
 </style>
 </head>
 
 <div class="fixed inset-0 overflow-hidden pointer-events-none">
-  <div class="blob blob-1 rounded-full"></div>
-  <div class="blob blob-2 rounded-full"></div>
+    <div class="blob blob-1 rounded-full"></div>
+    <div class="blob blob-2 rounded-full"></div>
 </div>
 
 <!-- Toast Container -->
@@ -234,320 +249,455 @@
 <!-- Wrapper: Mobile=Vertical Scroll, Desktop=Horizontal Fixed -->
 <div class="flex flex-col lg:flex-row h-auto lg:h-full w-full p-4 gap-4">
 
-  <!-- LEFT SIDEBAR -->
-  <!-- Mobile: Full Width, Auto Height | Desktop: Fixed Width 80, Full Height, Scrollable -->
-  <aside
-    class="w-full lg:w-80 glass-panel shadow-xl flex flex-col rounded-3xl overflow-hidden shrink-0 h-auto lg:h-full order-1">
-    <div class="lg:flex-1 lg:overflow-y-auto p-6 scroll-smooth">
+    <!-- LEFT SIDEBAR -->
+    <!-- Mobile: Full Width, Auto Height | Desktop: Fixed Width 80, Full Height, Scrollable -->
+    <aside
+        class="w-full lg:w-80 glass-panel shadow-xl flex flex-col rounded-3xl overflow-hidden shrink-0 h-auto lg:h-full order-2 lg:order-1">
+        <div class="lg:flex-1 lg:overflow-y-auto p-6 scroll-smooth">
 
-      <!-- Create Session -->
-      <div id="createSessionPanel">
-        <div
-          class="flex items-center gap-2 mb-5 mt-2 text-indigo-500 text-xs font-bold uppercase tracking-wider border-t border-slate-200/60 pt-5">
-          <i class="fa-solid fa-rocket"></i> เปิด Session ใหม่</div>
-        <div class="space-y-5">
-          <div>
-            <label class="text-xs font-bold text-slate-500 ml-1 mb-1 block">เลือกกลุ่มเรียน</label>
-            <div class="relative">
-              <select id="groupSelect" onchange="handleConfigChange()" class="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer shadow-sm text-slate-700 font-medium"><option value="">-- กรุณาเลือก --</option></select>
-              <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
-                <i class="fa-solid fa-chevron-down text-xs"></i></div>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="text-xs font-bold text-slate-500 ml-1 mb-1 block">สัปดาห์</label>
-              <div class="relative">
-                <select id="weekSelect" onchange="handleConfigChange()" class="w-full appearance-none bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer shadow-sm"></select>
-                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-400">
-                  <i class="fa-solid fa-chevron-down text-xs"></i></div>
-              </div>
-            </div>
-            <div>
-              <label class="text-xs font-bold text-slate-500 ml-1 mb-1 block">เวลา (นาที)</label>
-              <input type="number" id="timeLimit" value="15" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-center focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm font-mono">
-            </div>
-          </div>
-
-          <!-- Radius Input -->
-          <div>
-            <label class="text-xs font-bold text-slate-500 ml-1 mb-1 block">รัศมีเช็คชื่อ (เมตร)</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                <i class="fa-solid fa-ruler-horizontal text-xs"></i></div>
-              <input type="number" id="radiusLimit" value="100" class="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm font-mono" placeholder="100">
-            </div>
-          </div>
-
-          <div>
-            <label class="text-xs font-bold text-slate-500 ml-1 mb-1 block">ประเภทการเรียน</label>
-            <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl">
-              <label class="cursor-pointer"><input type="radio" name="classType" value="Lec" checked onchange="handleConfigChange()" class="peer sr-only"><div class="rounded-lg py-2 text-center text-xs font-bold text-slate-400 peer-checked:bg-white peer-checked:text-indigo-600 peer-checked:shadow-sm transition-all">Lecture</div></label>
-              <label class="cursor-pointer"><input type="radio" name="classType" value="Lab" onchange="handleConfigChange()" class="peer sr-only"><div class="rounded-lg py-2 text-center text-xs font-bold text-slate-400 peer-checked:bg-white peer-checked:text-purple-600 peer-checked:shadow-sm transition-all">Lab</div></label>
-            </div>
-          </div>
-
-          <!-- GPS Container -->
-          <div class="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 transition-all" id="gpsContainer">
-            <div class="flex justify-between items-center mb-3">
-              <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
-                  <i class="fa-solid fa-location-dot text-xs"></i></div>
-                <span class="text-xs font-bold text-indigo-900">พิกัด GPS</span>
-              </div>
-              <label class="inline-flex items-center cursor-pointer"><input type="checkbox" id="gpsToggle" class="sr-only peer" checked onchange="toggleGPS()"><div class="relative w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div></label>
-            </div>
-            <div id="gpsValues" class="transition-all duration-300">
-              <div class="flex gap-2 mb-2">
-                <input type="text" id="lat" placeholder="Lat" class="w-full text-[10px] bg-white border border-slate-200 rounded-lg p-2 text-center text-slate-500 font-mono shadow-sm" readonly><input type="text" id="lng" placeholder="Lng" class="w-full text-[10px] bg-white border border-slate-200 rounded-lg p-2 text-center text-slate-500 font-mono shadow-sm" readonly>
-              </div>
-
-              <div class="flex gap-2">
-                <button type="button" onclick="getLoc()" class="flex-1 text-[10px] bg-white border border-indigo-200 text-indigo-600 py-2 rounded-lg hover:bg-indigo-50 transition font-bold flex items-center justify-center gap-1 shadow-sm active:scale-95"><i class="fa-solid fa-rotate"></i> ดึงพิกัด</button>
-                <button type="button" onclick="openGoogleMaps()" class="flex-1 text-[10px] bg-emerald-50 border border-emerald-200 text-emerald-600 py-2 rounded-lg hover:bg-emerald-100 transition font-bold flex items-center justify-center gap-1 shadow-sm active:scale-95"><i class="fa-solid fa-map-location-dot"></i> ดูแผนที่</button>
-              </div>
-            </div>
-          </div>
-          <button type="button" onclick="startSession()" id="btnStart" class="w-full btn-primary py-3.5 rounded-xl text-base font-bold flex items-center justify-center gap-2"><i class="fa-solid fa-qrcode"></i> สร้าง QR Code</button>
-        </div>
-      </div>
-
-      <!-- Active Session -->
-      <div id="activeSessionPanel" class="hidden h-full flex flex-col justify-center animate-entry py-10 lg:py-0">
-        <div
-          class="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-6 rounded-3xl text-center shadow-inner relative overflow-hidden">
-          <div
-            class="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center mx-auto mb-4 text-emerald-500 relative z-10 border-4 border-emerald-50">
-            <span class="absolute top-0 right-0 flex h-5 w-5 -mt-1 -mr-1"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-5 w-5 bg-emerald-500 border-2 border-white"></span></span>
-            <i class="fa-solid fa-tower-broadcast text-3xl"></i>
-          </div>
-          <h2 class="text-xl font-bold text-emerald-900 mb-1">Session Active</h2>
-          <div
-            class="inline-block px-4 py-1 rounded-full bg-white border border-emerald-100 shadow-sm text-xs font-bold text-emerald-600 mb-6">
-            <span id="activeSessionInfo">Loading...</span></div>
-          <div class="bg-white rounded-2xl p-5 mb-6 shadow-sm border border-emerald-100">
-            <span class="text-[10px] text-slate-400 uppercase font-bold tracking-widest block mb-1">Time Remaining</span>
-            <div id="sidebarTimer" class="text-5xl font-mono font-bold text-slate-700 tracking-tighter tabular-nums">
-              00:00</div>
-          </div>
-          <div class="space-y-3">
-            <button type="button" onclick="showModal('qrModal')" class="w-full bg-white text-indigo-600 border border-indigo-200 py-3 rounded-xl text-sm font-bold hover:bg-indigo-50 hover:border-indigo-300 flex items-center justify-center gap-2 shadow-sm transition active:scale-95"><i class="fa-solid fa-qrcode"></i> เปิด QR Code</button>
-            <button type="button" onclick="confirmStopSession()" class="w-full btn-danger py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 active:scale-95"><i class="fa-solid fa-power-off"></i> ปิด Session</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- RIGHT DASHBOARD -->
-  <!-- Mobile: Full Width, Auto Height | Desktop: Flex-1, Full Height, Scrollable -->
-  <main class="w-full lg:flex-1 overflow-visible lg:overflow-y-auto pl-0 lg:pl-0 order-2">
-
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 animate-entry" style="animation-delay: 0.1s;">
-      <div
-        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-indigo-300 transition-all duration-300">
-        <div class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-indigo-50/50 to-transparent"></div>
-        <div class="relative z-10">
-          <p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">ทั้งหมด</p>
-          <h3 id="statTotal" class="text-4xl font-bold text-slate-700">0</h3>
-        </div>
-        <div
-          class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-500 shadow-sm group-hover:scale-110 transition duration-300">
-          <i class="fa-solid fa-users text-xl"></i></div>
-      </div>
-      <div
-        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-emerald-300 transition-all duration-300">
-        <div class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-emerald-50/50 to-transparent"></div>
-        <div class="relative z-10">
-          <p class="text-emerald-500 text-[10px] font-bold uppercase tracking-wider mb-1">มาเรียน</p>
-          <h3 id="statPresent" class="text-4xl font-bold text-emerald-600">0</h3>
-        </div>
-        <div
-          class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm group-hover:scale-110 transition duration-300">
-          <i class="fa-solid fa-user-check text-xl"></i></div>
-      </div>
-      <div
-        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-rose-300 transition-all duration-300">
-        <div class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-rose-50/50 to-transparent"></div>
-        <div class="relative z-10">
-          <p class="text-rose-500 text-[10px] font-bold uppercase tracking-wider mb-1">ขาดเรียน</p>
-          <h3 id="statAbsent" class="text-4xl font-bold text-rose-600">0</h3>
-        </div>
-        <div
-          class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 shadow-sm group-hover:scale-110 transition duration-300">
-          <i class="fa-solid fa-user-xmark text-xl"></i></div>
-      </div>
-    </div>
-
-    <!-- Main Content Grid -->
-    <!-- Mobile: Fixed Height 500px, Desktop: Remaining Height -->
-    <div
-      class="glass-panel rounded-[24px] h-[500px] lg:h-[calc(100%-140px)] flex flex-col overflow-hidden relative shadow-xl animate-entry mb-4 lg:mb-0"
-      style="animation-delay: 0.2s;">
-      <div
-        class="p-5 border-b border-slate-100 flex justify-between items-center bg-white/60 backdrop-blur-md sticky top-0 z-10">
-        <h3 class="font-bold text-slate-700 flex items-center gap-3 text-lg">
-          <div
-            class="bg-gradient-to-br from-indigo-500 to-purple-600 p-2 rounded-lg text-white shadow-md shadow-indigo-500/20">
-            <i class="fa-solid fa-list-check"></i></div> รายชื่อนักศึกษา
-        </h3>
-        <span class="text-[10px] font-bold bg-white border border-slate-200 text-slate-500 px-3 py-1.5 rounded-full shadow-sm flex items-center gap-2 whitespace-nowrap" id="dashInfo"><span class="w-2 h-2 rounded-full bg-slate-300"></span>
-        รอเลือกกลุ่ม</span>
-      </div>
-      <div class="flex-1 overflow-y-auto student-list bg-white/40">
-        <table class="w-full text-left border-collapse">
-          <thead
-            class="bg-slate-50/80 text-slate-400 text-[10px] font-bold uppercase sticky top-0 z-10 backdrop-blur-sm shadow-sm">
-            <tr>
-              <th class="p-4 w-12 text-center">#</th>
-              <th class="p-4 w-28 lg:w-32">รหัสนักศึกษา</th>
-              <th class="p-4">ชื่อ-นามสกุล</th>
-              <th class="p-4 text-center w-24 lg:w-32">เวลา</th>
-              <th class="p-4 text-center w-32 lg:w-40">สถานะ</th>
-            </tr>
-          </thead>
-          <tbody id="attendanceTable" class="text-sm text-slate-600 divide-y divide-slate-100 bg-white/60">
-            <tr>
-              <td colspan="5" class="p-20 text-center text-slate-400 italic">
-                <div class="flex flex-col items-center gap-4 opacity-60">
-                  <i class="fa-solid fa-clipboard-list text-6xl text-slate-300"></i><span>กรุณาเลือกกลุ่มเรียนทางด้านซ้ายเพื่อดูข้อมูล</span>
+            <!-- Create Session -->
+            <div id="createSessionPanel">
+                <div class="flex items-center gap-2 mb-6 text-indigo-500 text-xs font-bold uppercase tracking-wider">
+                    <i class="fa-solid fa-rocket"></i> เปิด Session ใหม่
                 </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                <div class="space-y-5">
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 ml-1 mb-1 block">เลือกกลุ่มเรียน</label>
+                        <div class="relative">
+                            <select id="groupSelect" onchange="handleConfigChange()"
+                                class="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer shadow-sm text-slate-700 font-medium">
+                                <option value="">-- กรุณาเลือก --</option>
+                            </select>
+                            <div
+                                class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                                <i class="fa-solid fa-chevron-down text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 ml-1 mb-1 block">สัปดาห์</label>
+                            <div class="relative">
+                                <select id="weekSelect" onchange="handleConfigChange()"
+                                    class="w-full appearance-none bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer shadow-sm"></select>
+                                <div
+                                    class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 ml-1 mb-1 block">เวลา (นาที)</label>
+                            <input type="number" id="timeLimit" value="15"
+                                class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-center focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm font-mono">
+                        </div>
+                    </div>
+
+                    <!-- Radius Input -->
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 ml-1 mb-1 block">รัศมีเช็คชื่อ (เมตร)</label>
+                        <div class="relative">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                <i class="fa-solid fa-ruler-horizontal text-xs"></i>
+                            </div>
+                            <input type="number" id="radiusLimit" value="100"
+                                class="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm font-mono"
+                                placeholder="100">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 ml-1 mb-1 block">ประเภทการเรียน</label>
+                        <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl">
+                            <label class="cursor-pointer"><input type="radio" name="classType" value="Lec" checked
+                                    onchange="handleConfigChange()" class="peer sr-only">
+                                <div
+                                    class="rounded-lg py-2 text-center text-xs font-bold text-slate-400 peer-checked:bg-white peer-checked:text-indigo-600 peer-checked:shadow-sm transition-all">
+                                    Lecture</div>
+                            </label>
+                            <label class="cursor-pointer"><input type="radio" name="classType" value="Lab"
+                                    onchange="handleConfigChange()" class="peer sr-only">
+                                <div
+                                    class="rounded-lg py-2 text-center text-xs font-bold text-slate-400 peer-checked:bg-white peer-checked:text-purple-600 peer-checked:shadow-sm transition-all">
+                                    Lab</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- GPS Container -->
+                    <div class="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 transition-all"
+                        id="gpsContainer">
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex items-center gap-2">
+                                <div
+                                    class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                                    <i class="fa-solid fa-location-dot text-xs"></i>
+                                </div>
+                                <span class="text-xs font-bold text-indigo-900">พิกัด GPS</span>
+                            </div>
+                            <label class="inline-flex items-center cursor-pointer"><input type="checkbox" id="gpsToggle"
+                                    class="sr-only peer" checked onchange="toggleGPS()">
+                                <div
+                                    class="relative w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600">
+                                </div>
+                            </label>
+                        </div>
+                        <div id="gpsValues" class="transition-all duration-300">
+                            <div class="flex gap-2 mb-2">
+                                <input type="text" id="lat" placeholder="Lat"
+                                    class="w-full text-[10px] bg-white border border-slate-200 rounded-lg p-2 text-center text-slate-500 font-mono shadow-sm"
+                                    readonly><input type="text" id="lng" placeholder="Lng"
+                                    class="w-full text-[10px] bg-white border border-slate-200 rounded-lg p-2 text-center text-slate-500 font-mono shadow-sm"
+                                    readonly>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <button type="button" onclick="getLoc()"
+                                    class="flex-1 text-[10px] bg-white border border-indigo-200 text-indigo-600 py-2 rounded-lg hover:bg-indigo-50 transition font-bold flex items-center justify-center gap-1 shadow-sm active:scale-95"><i
+                                        class="fa-solid fa-rotate"></i> ดึงพิกัด</button>
+                                <button type="button" onclick="openGoogleMaps()"
+                                    class="flex-1 text-[10px] bg-emerald-50 border border-emerald-200 text-emerald-600 py-2 rounded-lg hover:bg-emerald-100 transition font-bold flex items-center justify-center gap-1 shadow-sm active:scale-95"><i
+                                        class="fa-solid fa-map-location-dot"></i> ดูแผนที่</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="startSession()" id="btnStart"
+                        class="w-full btn-primary py-3.5 rounded-xl text-base font-bold flex items-center justify-center gap-2"><i
+                            class="fa-solid fa-qrcode"></i> สร้าง QR Code</button>
+                </div>
+            </div>
+
+            <!-- Active Session -->
+            <div id="activeSessionPanel" class="hidden h-full flex flex-col justify-center animate-entry py-10 lg:py-0">
+                <div
+                    class="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-6 rounded-3xl text-center shadow-inner relative overflow-hidden">
+                    <div
+                        class="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center mx-auto mb-4 text-emerald-500 relative z-10 border-4 border-emerald-50">
+                        <span class="absolute top-0 right-0 flex h-5 w-5 -mt-1 -mr-1"><span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span
+                                class="relative inline-flex rounded-full h-5 w-5 bg-emerald-500 border-2 border-white"></span></span>
+                        <i class="fa-solid fa-tower-broadcast text-3xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-emerald-900 mb-1">Session Active</h2>
+                    <div
+                        class="inline-block px-4 py-1 rounded-full bg-white border border-emerald-100 shadow-sm text-xs font-bold text-emerald-600 mb-6">
+                        <span id="activeSessionInfo">Loading...</span>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 mb-6 shadow-sm border border-emerald-100">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold tracking-widest block mb-1">Time
+                            Remaining</span>
+                        <div id="sidebarTimer"
+                            class="text-5xl font-mono font-bold text-slate-700 tracking-tighter tabular-nums">
+                            00:00</div>
+                    </div>
+                    <div class="space-y-3">
+                        <button type="button" onclick="showModal('qrModal')"
+                            class="w-full bg-white text-indigo-600 border border-indigo-200 py-3 rounded-xl text-sm font-bold hover:bg-indigo-50 hover:border-indigo-300 flex items-center justify-center gap-2 shadow-sm transition active:scale-95"><i
+                                class="fa-solid fa-qrcode"></i> เปิด QR Code</button>
+                        <button type="button" onclick="confirmStopSession()"
+                            class="w-full btn-danger py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 active:scale-95"><i
+                                class="fa-solid fa-power-off"></i> ปิด Session</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- STATS CARDS SECTION - Order 1 on mobile, show with main on desktop -->
+    <div class="w-full lg:hidden order-1">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 animate-entry" style="animation-delay: 0.1s;">
+            <div
+                class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-indigo-300 transition-all duration-300">
+                <div class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-indigo-50/50 to-transparent"></div>
+                <div class="relative z-10">
+                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">ทั้งหมด</p>
+                    <h3 id="statTotal" class="text-4xl font-bold text-slate-700">0</h3>
+                </div>
+                <div
+                    class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-500 shadow-sm group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-users text-xl"></i>
+                </div>
+            </div>
+            <div
+                class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-emerald-300 transition-all duration-300">
+                <div class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-emerald-50/50 to-transparent">
+                </div>
+                <div class="relative z-10">
+                    <p class="text-emerald-500 text-[10px] font-bold uppercase tracking-wider mb-1">มาเรียน</p>
+                    <h3 id="statPresent" class="text-4xl font-bold text-emerald-600">0</h3>
+                </div>
+                <div
+                    class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-user-check text-xl"></i>
+                </div>
+            </div>
+            <div
+                class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-rose-300 transition-all duration-300">
+                <div class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-rose-50/50 to-transparent"></div>
+                <div class="relative z-10">
+                    <p class="text-rose-500 text-[10px] font-bold uppercase tracking-wider mb-1">ขาดเรียน</p>
+                    <h3 id="statAbsent" class="text-4xl font-bold text-rose-600">0</h3>
+                </div>
+                <div
+                    class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 shadow-sm group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-user-xmark text-xl"></i>
+                </div>
+            </div>
+        </div>
     </div>
-  </main>
+
+    <!-- RIGHT DASHBOARD - Order 3 on mobile, order 2 on desktop -->
+    <main class="w-full lg:flex-1 overflow-visible lg:overflow-y-auto pl-0 lg:pl-0 order-3 lg:order-2">
+
+        <!-- Stats Cards - Show only on desktop -->
+        <div class="hidden lg:grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 animate-entry" style="animation-delay: 0.1s;">
+            <div
+                class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-indigo-300 transition-all duration-300">
+                <div class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-indigo-50/50 to-transparent"></div>
+                <div class="relative z-10">
+                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">ทั้งหมด</p>
+                    <h3 id="statTotal2" class="text-4xl font-bold text-slate-700">0</h3>
+                </div>
+                <div
+                    class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-500 shadow-sm group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-users text-xl"></i>
+                </div>
+            </div>
+            <div
+                class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-emerald-300 transition-all duration-300">
+                <div class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-emerald-50/50 to-transparent">
+                </div>
+                <div class="relative z-10">
+                    <p class="text-emerald-500 text-[10px] font-bold uppercase tracking-wider mb-1">มาเรียน</p>
+                    <h3 id="statPresent2" class="text-4xl font-bold text-emerald-600">0</h3>
+                </div>
+                <div
+                    class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-user-check text-xl"></i>
+                </div>
+            </div>
+            <div
+                class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-rose-300 transition-all duration-300">
+                <div class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-rose-50/50 to-transparent"></div>
+                <div class="relative z-10">
+                    <p class="text-rose-500 text-[10px] font-bold uppercase tracking-wider mb-1">ขาดเรียน</p>
+                    <h3 id="statAbsent2" class="text-4xl font-bold text-rose-600">0</h3>
+                </div>
+                <div
+                    class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 shadow-sm group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-user-xmark text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <!-- Mobile: Fixed Height 500px, Desktop: Remaining Height -->
+        <div class="glass-panel rounded-[24px] h-[500px] lg:h-[calc(100%-140px)] flex flex-col overflow-hidden relative shadow-xl animate-entry mb-4 lg:mb-0"
+            style="animation-delay: 0.2s;">
+            <div
+                class="p-5 border-b border-slate-100 flex justify-between items-center bg-white/60 backdrop-blur-md sticky top-0 z-10">
+                <h3 class="font-bold text-slate-700 flex items-center gap-3 text-lg">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 p-2 rounded-lg text-white shadow-md shadow-indigo-500/20">
+                        <i class="fa-solid fa-list-check ml-1"></i>
+                    </div> รายชื่อนักศึกษา
+                </h3>
+                <span
+                    class="text-[10px] font-bold bg-white border border-slate-200 text-slate-500 px-3 py-1.5 rounded-full shadow-sm flex items-center gap-2 whitespace-nowrap"
+                    id="dashInfo"><span class="w-2 h-2 rounded-full bg-slate-300"></span>
+                    รอเลือกกลุ่ม</span>
+            </div>
+            <div class="flex-1 overflow-y-auto student-list bg-white/40">
+                <table class="w-full text-left border-collapse">
+                    <thead
+                        class="bg-slate-50/80 text-slate-400 text-[10px] font-bold uppercase sticky top-0 z-10 backdrop-blur-sm shadow-sm">
+                        <tr>
+                            <th class="p-4 w-12 text-center">#</th>
+                            <th class="p-4 w-28 lg:w-32">รหัสนักศึกษา</th>
+                            <th class="p-4">ชื่อ-นามสกุล</th>
+                            <th class="p-4 text-center w-24 lg:w-32">เวลา</th>
+                            <th class="p-4 text-center w-32 lg:w-40">สถานะ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTable" class="text-sm text-slate-600 divide-y divide-slate-100 bg-white/60">
+                        <tr>
+                            <td colspan="5" class="p-20 text-center text-slate-400 italic">
+                                <div class="flex flex-col items-center gap-4 opacity-60">
+                                    <i
+                                        class="fa-solid fa-clipboard-list text-6xl text-slate-300"></i><span>กรุณาเลือกกลุ่มเรียนทางด้านซ้ายเพื่อดูข้อมูล</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
 </div>
 
 <!-- ====== MODALS (Keep your existing modals here) ====== -->
 <!-- QR MODAL, EDIT MODAL, CONFIRM MODAL ... (ใช้โค้ดเดิมได้เลย ไม่ต้องแก้ HTML ส่วนนี้) -->
 <div id="qrModal"
-  class="hidden fixed inset-0 z-50 flex items-center justify-center modal-hide transition-all duration-300 p-4">
-  <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md modal-backdrop"></div>
-  <div
-    class="bg-white rounded-[32px] shadow-2xl w-full max-w-md p-6 lg:p-8 relative flex flex-col items-center border border-white/50 modal-content m-4 max-h-[90vh] overflow-y-auto">
-    <button type="button" onclick="closeModal('qrModal')" class="absolute top-5 right-5 w-10 h-10 bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark text-lg"></i></button>
-    <div class="text-center mb-6">
-      <h2 class="text-2xl font-bold text-slate-800 mb-1">สแกนเพื่อเช็คชื่อ</h2>
-      <div class="inline-block bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full text-xs font-bold" id="qrModalTitle">
-        Group Name</div>
-    </div>
+    class="hidden fixed inset-0 z-50 flex items-center justify-center modal-hide transition-all duration-300 p-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md modal-backdrop"></div>
     <div
-      class="mb-6 flex items-center justify-between gap-4 w-full bg-slate-50 border border-slate-100 p-3 rounded-2xl">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center text-rose-500">
-          <i class="fa-regular fa-clock"></i></div>
-        <div class="flex flex-col text-left">
-          <span class="text-[10px] text-rose-400 font-bold uppercase tracking-wider leading-none">Expires In</span><span class="text-rose-600 font-mono font-bold text-lg leading-none mt-1" id="modalTimer">00:00</span>
+        class="bg-white rounded-[32px] shadow-2xl w-full max-w-md p-6 lg:p-8 relative flex flex-col items-center border border-white/50 modal-content m-4 max-h-[90vh] overflow-y-auto">
+        <button type="button" onclick="closeModal('qrModal')"
+            class="absolute top-5 right-5 w-10 h-10 bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-full flex items-center justify-center transition"><i
+                class="fa-solid fa-xmark text-lg"></i></button>
+        <div class="text-center mb-6">
+            <h2 class="text-2xl font-bold text-slate-800 mb-1">สแกนเพื่อเช็คชื่อ</h2>
+            <div class="inline-block bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full text-xs font-bold"
+                id="qrModalTitle">
+                Group Name</div>
         </div>
-      </div>
-      <div class="h-8 w-[1px] bg-slate-200"></div>
-      <button type="button" onclick="copySessionLink()" id="btnCopy" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm transition active:scale-95"><i class="fa-regular fa-copy"></i> Copy Link</button>
-      <input type="text" id="sessionUrlInput" class="hidden">
+        <div
+            class="mb-6 flex items-center justify-between gap-4 w-full bg-slate-50 border border-slate-100 p-3 rounded-2xl">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center text-rose-500">
+                    <i class="fa-regular fa-clock"></i>
+                </div>
+                <div class="flex flex-col text-left">
+                    <span class="text-[10px] text-rose-400 font-bold uppercase tracking-wider leading-none">Expires
+                        In</span><span class="text-rose-600 font-mono font-bold text-lg leading-none mt-1"
+                        id="modalTimer">00:00</span>
+                </div>
+            </div>
+            <div class="h-8 w-[1px] bg-slate-200"></div>
+            <button type="button" onclick="copySessionLink()" id="btnCopy"
+                class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm transition active:scale-95"><i
+                    class="fa-regular fa-copy"></i> Copy Link</button>
+            <input type="text" id="sessionUrlInput" class="hidden">
+        </div>
+        <div
+            class="bg-white p-4 rounded-[24px] border-2 border-slate-100 shadow-[0_10px_30px_rgba(0,0,0,0.05)] mb-6 relative group cursor-pointer hover:border-indigo-200 transition-colors">
+            <img id="modalQrImage" class="w-full h-auto max-h-256 object-contain relative z-10 rounded-xl" src="">
+        </div>
+        <div class="grid grid-cols-2 gap-3 w-full">
+            <button type="button" onclick="closeModal('qrModal')"
+                class="py-3 bg-slate-100 rounded-xl text-slate-600 font-bold hover:bg-slate-200 transition text-sm">ซ่อน
+                (Hide)</button>
+            <button type="button" onclick="confirmStopSession()"
+                class="py-3 btn-danger rounded-xl text-sm font-bold flex items-center justify-center gap-2"><i
+                    class="fa-solid fa-power-off"></i> ปิด Session</button>
+        </div>
     </div>
-    <div
-      class="bg-white p-4 rounded-[24px] border-2 border-slate-100 shadow-[0_10px_30px_rgba(0,0,0,0.05)] mb-6 relative group cursor-pointer hover:border-indigo-200 transition-colors">
-      <img id="modalQrImage" class="w-full h-auto max-h-256 object-contain relative z-10 rounded-xl" src=""></div>
-    <div class="grid grid-cols-2 gap-3 w-full">
-      <button type="button" onclick="closeModal('qrModal')" class="py-3 bg-slate-100 rounded-xl text-slate-600 font-bold hover:bg-slate-200 transition text-sm">ซ่อน (Hide)</button>
-      <button type="button" onclick="confirmStopSession()" class="py-3 btn-danger rounded-xl text-sm font-bold flex items-center justify-center gap-2"><i class="fa-solid fa-power-off"></i> ปิด Session</button>
-    </div>
-  </div>
 </div>
 
 <div id="confirmModal"
-  class="hidden fixed inset-0 z-50 flex items-center justify-center modal-hide transition-all duration-300 p-4">
-  <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md modal-backdrop"></div>
-  <div
-    class="bg-white rounded-[24px] shadow-2xl w-full max-w-sm p-6 relative flex flex-col items-center text-center border border-white/50 modal-content">
-    <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4 text-3xl" id="confirmIconWrapper">
-      <i id="confirmIcon"></i>
+    class="hidden fixed inset-0 z-50 flex items-center justify-center modal-hide transition-all duration-300 p-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md modal-backdrop"></div>
+    <div
+        class="bg-white rounded-[32px] shadow-2xl w-full max-w-md p-6 lg:p-8 relative flex flex-col items-center text-center border border-white/50 modal-content overflow-hidden">
+        <button type="button" onclick="closeModal('confirmModal')"
+            class="absolute top-4 right-4 w-10 h-10 bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-full flex items-center justify-center transition shadow-sm">
+            <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+        <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4 text-3xl" id="confirmIconWrapper">
+            <i id="confirmIcon"></i>
+        </div>
+        <h3 class="text-xl font-bold text-slate-800 mb-2" id="confirmTitle">Title</h3>
+        <div id="confirmBody" class="text-slate-500 text-sm mb-6 w-full break-words">Details</div>
+        <div class="grid grid-cols-2 gap-3 w-full">
+            <button type="button" onclick="closeModal('confirmModal')"
+                class="py-2.5 btn-secondary rounded-xl text-sm font-bold">ยกเลิก</button>
+            <button type="button" id="btnConfirmAction"
+                class="py-2.5 rounded-xl text-sm font-bold text-white shadow-lg transition transform active:scale-95 bg-indigo-600 hover:bg-indigo-700 cursor-pointer">ยืนยัน</button>
+        </div>
     </div>
-    <h3 class="text-xl font-bold text-slate-800 mb-2" id="confirmTitle">Title</h3>
-    <div id="confirmBody" class="text-slate-500 text-sm mb-6 w-full break-words">Details</div>
-    <div class="grid grid-cols-2 gap-3 w-full">
-      <button type="button" onclick="closeModal('confirmModal')" class="py-2.5 btn-secondary rounded-xl text-sm font-bold">ยกเลิก</button>
-      <button type="button" id="btnConfirmAction" class="py-2.5 rounded-xl text-sm font-bold text-white shadow-lg transition transform active:scale-95">ยืนยัน</button>
-    </div>
-  </div>
 </div>
 
 <script>
-  let groupsData = [],
+    let groupsData = [],
         refreshInterval,
         timerInterval,
         currentSessionEndTime = null,
         currentSessionUrl = "",
         currentSessionInfo = {};
 
-      window.onload = function () {
+    window.onload = function () {
         const wkSel = document.getElementById("weekSelect");
         for (let i = 1; i <= 12; i++) {
-          let opt = document.createElement("option");
-          opt.value = i;
-          opt.text = "Week " + i;
-          wkSel.appendChild(opt);
+            let opt = document.createElement("option");
+            opt.value = i;
+            opt.text = "Week " + i;
+            wkSel.appendChild(opt);
         }
         loadGroups();
         getLoc();
         google.script.run
-          .withSuccessHandler((res) => {
-            if (res.active)
-              activateSessionState(
-                res.expireTime,
-                res.url,
-                res.groupName,
-                res.week,
-                res.type,
-                res.sheetId
-              );
-          })
-          .getSessionStatus();
-      };
+            .withSuccessHandler((res) => {
+                if (res.active)
+                    activateSessionState(
+                        res.expireTime,
+                        res.url,
+                        res.groupName,
+                        res.week,
+                        res.type,
+                        res.sheetId
+                    );
+            })
+            .getSessionStatus();
+    };
 
-      // Listen for groups update from Main.html
-      window.addEventListener('groupsUpdated', function(e) {
+    // Listen for groups update from Main.html
+    window.addEventListener('groupsUpdated', function (e) {
         groupsData = e.detail;
         updateGroupSelect();
-      });
+    });
 
-      function loadGroups() {
+    function loadGroups() {
         google.script.run.withSuccessHandler((data) => {
-          groupsData = data;
-          updateGroupSelect();
+            groupsData = data;
+            updateGroupSelect();
         }).getGroups();
-      }
+    }
 
-      function updateGroupSelect() {
+    function updateGroupSelect() {
         const select = document.getElementById("groupSelect");
         select.innerHTML = '<option value="">-- กรุณาเลือก --</option>';
         groupsData.forEach((g, i) => {
-          let opt = document.createElement("option");
-          opt.value = i;
-          opt.text = g.name;
-          select.appendChild(opt);
+            let opt = document.createElement("option");
+            opt.value = i;
+            opt.text = g.name;
+            select.appendChild(opt);
         });
-      }
+    }
 
-      // --- Modal Logic ---
-      function showModal(id) {
+    // --- Modal Logic ---
+    function showModal(id) {
         const el = document.getElementById(id);
         el.classList.remove("hidden");
         setTimeout(() => {
-          el.classList.remove("modal-hide");
-          el.classList.add("modal-show");
+            el.classList.remove("modal-hide");
+            el.classList.add("modal-show");
         }, 10);
-      }
-      function closeModal(id) {
+    }
+    function closeModal(id) {
         const el = document.getElementById(id);
         el.classList.remove("modal-show");
         el.classList.add("modal-hide");
-        setTimeout(() => el.classList.add("hidden"), 300);
-      }
-      function showConfirm(title, body, iconClass, iconBg, btnClass, callback) {
+        setTimeout(() => {
+            el.classList.add("hidden");
+            // รีเซ็ต confirmModal กลับสู่สถานะเริ่มต้นเมื่อปิด
+            if (id === "confirmModal") {
+                resetConfirmModal();
+            }
+        }, 300);
+    }
+
+    function resetConfirmModal() {
+        const modal = document.getElementById("confirmModal");
+        const buttonsContainer = modal.querySelector(".grid");
+        // รีเซ็ตปุ่มกลับเป็น 2 ปุ่มแบบมาตรฐาน
+        buttonsContainer.className = "grid grid-cols-2 gap-3 w-full";
+        buttonsContainer.innerHTML = `
+          <button type="button" onclick="closeModal('confirmModal')" class="py-2.5 btn-secondary rounded-xl text-sm font-bold">ยกเลิก</button>
+          <button type="button" id="btnConfirmAction" class="py-2.5 rounded-xl text-sm font-bold text-white shadow-lg transition transform active:scale-95 bg-indigo-600 hover:bg-indigo-700 cursor-pointer">ยืนยัน</button>
+        `;
+    }
+    function showConfirm(title, body, iconClass, iconBg, btnClass, callback) {
         document.getElementById("confirmTitle").innerText = title;
         document.getElementById("confirmBody").innerHTML = body;
         const iconWrapper = document.getElementById("confirmIconWrapper");
@@ -556,160 +706,260 @@
         const btn = document.getElementById("btnConfirmAction");
         btn.className = `py-2.5 rounded-xl text-sm font-bold text-white shadow-lg transition transform active:scale-95 ${btnClass}`;
         btn.onclick = () => {
-          callback();
-          closeModal("confirmModal");
+            callback();
+            closeModal("confirmModal");
         };
         showModal("confirmModal");
-      }
-      function showToast(msg, type = "success") {
+    }
+    function showToast(msg, type = "success") {
         const t = document.createElement("div");
         t.className = `toast ${type}`;
-        t.innerHTML = `<i class="fa-solid ${
-          type === "success"
-            ? "fa-circle-check text-emerald-500"
-            : "fa-circle-xmark text-rose-500"
-        } text-xl"></i><div><h4 class="font-bold text-slate-800 text-sm">${
-          type === "success" ? "สำเร็จ" : "ข้อผิดพลาด"
-        }</h4><p class="text-xs text-slate-500">${msg}</p></div>`;
+        t.innerHTML = `<i class="fa-solid ${type === "success"
+                ? "fa-circle-check text-emerald-500"
+                : "fa-circle-xmark text-rose-500"
+            } text-xl"></i><div><h4 class="font-bold text-slate-800 text-sm">${type === "success" ? "สำเร็จ" : "ข้อผิดพลาด"
+            }</h4><p class="text-xs text-slate-500">${msg}</p></div>`;
         document.getElementById("toast-container").appendChild(t);
         setTimeout(() => t.classList.add("show"), 10);
         setTimeout(() => {
-          t.classList.remove("show");
-          setTimeout(() => t.remove(), 300);
+            t.classList.remove("show");
+            setTimeout(() => t.remove(), 300);
         }, 3000);
-      }
+    }
 
-      // --- Session ---
-      function startSession() {
+    // --- Session ---
+    function startSession() {
         const idx = document.getElementById("groupSelect").value;
         if (idx === "") {
-          showToast("กรุณาเลือกกลุ่มก่อน", "error");
-          return;
+            showToast("กรุณาเลือกกลุ่มก่อน", "error");
+            return;
         }
         const group = groupsData[idx],
-          week = document.getElementById("weekSelect").value,
-          type = document.querySelector(
-            'input[name="classType"]:checked'
-          ).value,
-          time = document.getElementById("timeLimit").value;
+            week = document.getElementById("weekSelect").value,
+            type = document.querySelector(
+                'input[name="classType"]:checked'
+            ).value,
+            time = document.getElementById("timeLimit").value;
         const radius = document.getElementById("radiusLimit").value;
         const useGPS = document.getElementById("gpsToggle").checked;
         let lat = 0,
-          lng = 0;
+            lng = 0;
         if (useGPS) {
-          lat = document.getElementById("lat").value;
-          lng = document.getElementById("lng").value;
-          if (!lat || !lng) {
-            showToast("กรุณาดึงพิกัด GPS", "error");
-            return;
-          }
+            lat = document.getElementById("lat").value;
+            lng = document.getElementById("lng").value;
+            if (!lat || !lng) {
+                showToast("กรุณาดึงพิกัด GPS", "error");
+                return;
+            }
         }
 
         document.getElementById("btnStart").disabled = true;
-        document.getElementById("btnStart").innerHTML =
-          '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
+        document.getElementById("btnStart").innerHTML = `
+      <div class="flex items-center gap-3">
+            <div class="relative">
+              <i class="fa-solid fa-circle-notch fa-spin animate-spin"></i>
+            </div>
+            <p class="text-sm font-medium">กำลังสร้าง QR Code...</p>
+      </div>
+    `;
+
         const payload = {
-          groupName: group.name,
-          sheetId: group.id,
-          week,
-          type,
-          timeLimit: parseInt(time),
-          radius: parseInt(radius) || 100,
-          lat: parseFloat(lat || 0),
-          lng: parseFloat(lng || 0),
-          requireGPS: useGPS,
+            groupName: group.name,
+            sheetId: group.id,
+            week,
+            type,
+            timeLimit: parseInt(time),
+            radius: parseInt(radius) || 100,
+            lat: parseFloat(lat || 0),
+            lng: parseFloat(lng || 0),
+            requireGPS: useGPS,
         };
 
         google.script.run
-          .withSuccessHandler((res) => {
-            document.getElementById("btnStart").disabled = false;
-            document.getElementById("btnStart").innerHTML =
-              '<i class="fa-solid fa-qrcode"></i> สร้าง QR Code';
-            if (res.success) {
-              activateSessionState(
-                res.expireTime,
-                res.url,
-                res.groupName,
-                res.week,
-                res.type,
-                group.id
-              );
-              showModal("qrModal");
-            }
-          })
-          .createSession(payload);
-      }
+            .withSuccessHandler((res) => {
+                document.getElementById("btnStart").disabled = false;
+                document.getElementById("btnStart").innerHTML =
+                    '<i class="fa-solid fa-qrcode"></i> สร้าง QR Code';
+                if (res.success) {
+                    activateSessionState(
+                        res.expireTime,
+                        res.url,
+                        res.groupName,
+                        res.week,
+                        res.type,
+                        group.id
+                    );
+                    showModal("qrModal");
+                }
+            })
+            .createSession(payload);
+    }
 
-      function confirmStopSession() {
+    function confirmStopSession() {
         showConfirm(
-          "ปิด Session?",
-          "นักเรียนจะไม่สามารถเช็คชื่อได้อีก",
-          "fa-solid fa-power-off",
-          "bg-rose-100 text-rose-500",
-          "bg-rose-500 hover:bg-rose-600",
-          () => stopSession()
+            "ปิด Session?",
+            "นักเรียนจะไม่สามารถเช็คชื่อได้อีก",
+            "fa-solid fa-power-off",
+            "bg-rose-100 text-rose-500",
+            "bg-rose-500 hover:bg-rose-600",
+            () => stopSession()
         );
-      }
+    }
 
-      function stopSession(auto = false) {
+    function stopSession(auto = false) {
         closeModal("qrModal");
         google.script.run
-          .withSuccessHandler(() => {
-            deactivateSessionState();
-            if (auto) showToast("Session หมดเวลาแล้ว", "error");
-            else showToast("ปิด Session เรียบร้อย");
-          })
-          .stopCurrentSession();
-      }
+            .withSuccessHandler(() => {
+                deactivateSessionState();
+                if (auto) showToast("Session หมดเวลาแล้ว", "error");
+                else showToast("ปิด Session เรียบร้อย");
+            })
+            .stopCurrentSession();
+    }
 
-      function manualCheckIn(sid, sname) {
-        // สร้าง HTML Body สำหรับยืนยัน (Custom)
+    function manualCheckIn(sid, sname) {
+        // สร้าง HTML Body สำหรับแสดงข้อมูลนักเรียน
         const bodyHtml = `
-            <div class="p-4 bg-teal-50 border border-teal-200 rounded-xl shadow-md mb-4">
-                <div class="flex items-center gap-3">
-                    <div class="flex flex-col text-left">
-                        <span class="text-xs font-bold text-slate-500 uppercase leading-none">รหัสนักศึกษา</span>
-                        <span class="text-lg font-mono font-bold text-indigo-600 leading-tight">${sid}</span>
-                    </div>
+            <div class="mb-4 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 p-4 rounded-2xl flex items-center justify-between shadow-sm">
+              <div class="flex items-center gap-3 overflow-hidden">
+                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-50 shrink-0">
+                  <i class="fa-solid fa-user-graduate"></i>
                 </div>
-                <div class="mt-3 pt-3 border-t border-teal-100/70 text-left">
-                    <span class="text-xs font-bold text-slate-500 uppercase leading-none block">ชื่อ-นามสกุล</span>
-                    <span class="text-base font-medium text-slate-700">${sname}</span>
+                <div class="min-w-0">
+                  <h3 class="text-sm font-bold text-slate-800 truncate">${sname}</h3>
+                  <p class="text-sm text-left font-bold text-indigo-500">${sid}</p>
                 </div>
+              </div>
             </div>
-            <div class="text-xs text-slate-500 font-medium mt-1">ยืนยันเปลี่ยนสถานะเป็น "มาเรียน"</div>
+            <div class="text-xs text-slate-500 font-medium text-center">เลือกสถานะการเข้าเรียน</div>
         `;
 
-        showConfirm(
-          "ยืนยันเช็คชื่อ?",
-          bodyHtml,
-          "fa-solid fa-user-check",
-          "bg-indigo-100 text-indigo-600",
-          "bg-indigo-600 hover:bg-indigo-700",
-          () => {
-            const cfg = window.currentDashboardConfig;
-            if (!cfg) return;
-            google.script.run
-              .withSuccessHandler((res) => {
-                if (res.success) {
-                  updateDashboard(cfg.sheetId, cfg.week, cfg.type);
-                  showToast("เช็คชื่อเรียบร้อย");
-                } else showToast(res.msg, "error");
-              })
-              .adminManualCheckIn(cfg.sheetId, cfg.week, cfg.type, sid);
-          }
-        );
-      }
+        // แสดง modal
+        document.getElementById("confirmTitle").innerText = "เช็คชื่อด้วยตนเอง";
+        document.getElementById("confirmBody").innerHTML = bodyHtml;
+        const iconWrapper = document.getElementById("confirmIconWrapper");
+        iconWrapper.className = "w-16 h-16 rounded-full flex items-center justify-center mb-4 text-3xl bg-indigo-100 text-indigo-600";
+        document.getElementById("confirmIcon").className = "fa-solid fa-user-check";
 
-      // --- State & Updates ---
-      function activateSessionState(
+        // แสดงปุ่ม 3 ปุ่ม: ยกเลิก, มาสาย, มาเรียน
+        const modal = document.getElementById("confirmModal");
+        const buttonsContainer = modal.querySelector(".grid.grid-cols-2");
+        buttonsContainer.className = "grid grid-cols-3 gap-2 w-full";
+        buttonsContainer.innerHTML = `
+          <button type="button" onclick="closeModal('confirmModal')" class="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-bold transition">ยกเลิก</button>
+          <button type="button" onclick="confirmManualCheckIn('${sid}', '${sname}', 'Late', 0.5)" class="py-2.5 bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl text-sm font-bold shadow-lg transition transform active:scale-95 flex flex-col items-center justify-center">
+            <div class="flex items-center gap-1">
+              <i class="fa-solid fa-clock text-xs"></i>
+              <span>มาสาย</span>
+            </div>
+            <div class="text-xs opacity-90">0.5 คะแนน</div>
+          </button>
+          <button type="button" onclick="confirmManualCheckIn('${sid}', '${sname}', 'Present', 1)" class="py-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl text-sm font-bold shadow-lg transition transform active:scale-95 flex flex-col items-center justify-center">
+            <div class="flex items-center gap-1">
+              <i class="fa-solid fa-check text-xs"></i>
+              <span>มาเรียน</span>
+            </div>
+            <div class="text-xs opacity-90">1 คะแนน</div>
+          </button>
+        `;
+
+        modal.classList.remove("hidden");
+        setTimeout(() => {
+            modal.classList.remove("modal-hide");
+            modal.classList.add("modal-show");
+        }, 10);
+    }
+
+    function confirmManualCheckIn(sid, sname, status, score) {
+        // closeModal("confirmModal");
+
+        // เปลี่ยน UI เป็นโหมดยืนยัน
+        const statusText = status === "Present" ? "มาเรียน" : "มาสาย";
+        const statusColor = status === "Present" ? "emerald" : "amber";
+
+        // อัพเดท Title
+        document.getElementById("confirmTitle").innerText = "ยืนยันการเช็คชื่อ ?";
+
+        // อัพเดท Body
+        document.getElementById("confirmBody").innerHTML = `
+          <div class="text-center">
+             <div class="mb-4 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 p-4 rounded-2xl flex items-center justify-between shadow-sm">
+              <div class="flex items-center gap-3 overflow-hidden">
+                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-50 shrink-0">
+                  <i class="fa-solid fa-user-graduate"></i>
+                </div>
+                <div class="min-w-0">
+                  <h3 class="text-sm font-bold text-slate-800 truncate">${sname}</h3>
+                  <p class="text-sm text-left font-bold text-indigo-500">${sid}</p>
+                </div>
+              </div>
+            </div>
+            <div class="text-xs text-slate-500 font-medium text-center">เลือกสถานะการเข้าเรียน</div>
+            <div class="inline-block px-4 py-2 rounded-lg bg-${statusColor}-100 border border-${statusColor}-200">
+              <span class="text-${statusColor}-700 font-bold">${statusText}</span>
+              <span class="text-${statusColor}-600 text-sm ml-2">(${score} คะแนน)</span>
+            </div>
+          </div>
+        `;
+
+        // อัพเดท Icon
+        const iconWrapper = document.getElementById("confirmIconWrapper");
+        iconWrapper.className = `w-16 h-16 rounded-full flex items-center justify-center mb-4 text-3xl bg-${statusColor}-100 text-${statusColor}-600`;
+        document.getElementById("confirmIcon").className = "fa-solid fa-check-circle";
+
+        // รีเซ็ตปุ่มกลับเป็น 2 ปุ่ม (ยกเลิก และ ยืนยัน)
+        const modal = document.getElementById("confirmModal");
+        const buttonsContainer = modal.querySelector(".grid");
+        buttonsContainer.className = "grid grid-cols-2 gap-3 w-full";
+        buttonsContainer.innerHTML = `
+          <button type="button" onclick="closeModal('confirmModal')" class="py-2.5 btn-secondary rounded-xl text-sm font-bold">ยกเลิก</button>
+          <button type="button" id="btnConfirmAction" class="py-2.5 rounded-xl text-sm font-bold text-white shadow-lg transition transform active:scale-95 bg-${statusColor}-600 hover:bg-${statusColor}-700 cursor-pointer">ยืนยัน</button>
+        `;
+
+        // ตั้งค่าฟังก์ชันสำหรับปุ่มยืนยัน
+        const btnConfirm = document.getElementById("btnConfirmAction");
+        btnConfirm.onclick = () => {
+            const cfg = window.currentDashboardConfig;
+            if (!cfg) {
+                showToast("ไม่พบข้อมูลการตั้งค่า", "error");
+                closeModal("confirmModal");
+                return;
+            }
+
+            // แสดง loading บนปุ่ม
+            btnConfirm.disabled = true;
+            btnConfirm.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> กำลังบันทึก...';
+
+            google.script.run
+                .withSuccessHandler((res) => {
+                    if (res.success) {
+                        closeModal("confirmModal");
+                        updateDashboard(cfg.sheetId, cfg.week, cfg.type);
+                        showToast(`เช็คชื่อเรียบร้อย: ${statusText} (${score} คะแนน)`);
+                    } else {
+                        showToast(res.msg, "error");
+                        btnConfirm.disabled = false;
+                        btnConfirm.innerHTML = 'ยืนยัน';
+                    }
+                })
+                .withFailureHandler((error) => {
+                    showToast("เกิดข้อผิดพลาด: " + error.message, "error");
+                    btnConfirm.disabled = false;
+                    btnConfirm.innerHTML = 'ยืนยัน';
+                })
+                .adminManualCheckIn(cfg.sheetId, cfg.week, cfg.type, sid, status, score);
+        };
+    }
+
+    // --- State & Updates ---
+    function activateSessionState(
         endTime,
         url,
         groupName,
         week,
         type,
         sheetId
-      ) {
+    ) {
         currentSessionEndTime = endTime;
         currentSessionUrl = url;
         currentSessionInfo = { groupName, week, type };
@@ -717,193 +967,257 @@
 
         // Modal QR Setup
         const qr =
-          "https://quickchart.io/qr?text=" +
-          encodeURIComponent(url) +
-          "&size=500&margin=2";
+            "https://quickchart.io/qr?text=" +
+            encodeURIComponent(url) +
+            "&size=500&margin=2";
         document.getElementById("modalQrImage").src = qr;
         document.getElementById(
-          "qrModalTitle"
+            "qrModalTitle"
         ).innerText = `${groupName} | Week ${week} (${type})`;
 
         document.getElementById("createSessionPanel").classList.add("hidden");
         document
-          .getElementById("activeSessionPanel")
-          .classList.remove("hidden");
+            .getElementById("activeSessionPanel")
+            .classList.remove("hidden");
         document.getElementById("sessionBadge").classList.remove("hidden");
         document.getElementById(
-          "activeSessionInfo"
+            "activeSessionInfo"
         ).innerText = `${groupName} | Week ${week} (${type})`;
         document.getElementById(
-          "dashInfo"
+            "dashInfo"
         ).innerHTML = `<span class="w-2 h-2 rounded-full bg-indigo-500"></span> ${groupName} (W${week}-${type})`;
         startTimer();
         if (refreshInterval) clearInterval(refreshInterval);
         refreshInterval = setInterval(
-          () => updateDashboard(sheetId, week, type),
-          3000
+            () => updateDashboard(sheetId, week, type),
+            3000
         );
         updateDashboard(sheetId, week, type);
-      }
+    }
 
-      function deactivateSessionState() {
+    function deactivateSessionState() {
         currentSessionEndTime = null;
         clearInterval(timerInterval);
         clearInterval(refreshInterval);
         document
-          .getElementById("createSessionPanel")
-          .classList.remove("hidden");
+            .getElementById("createSessionPanel")
+            .classList.remove("hidden");
         document.getElementById("activeSessionPanel").classList.add("hidden");
         document.getElementById("sessionBadge").classList.add("hidden");
         closeModal("qrModal");
         // resetStats(); // ไม่ต้อง Reset เพื่อให้เห็นผลลัพธ์ล่าสุดค้างไว้
-      }
+    }
 
-      function toggleGPS() {
+    function toggleGPS() {
         const checked = document.getElementById("gpsToggle").checked;
         const container = document.getElementById("gpsContainer");
         const inputs = document.getElementById("gpsValues");
         if (checked) {
-          container.classList.remove("opacity-50");
-          inputs.classList.remove("pointer-events-none");
-          getLoc();
+            container.classList.remove("opacity-50");
+            inputs.classList.remove("pointer-events-none");
+            getLoc();
         } else {
-          container.classList.add("opacity-50");
-          inputs.classList.add("pointer-events-none");
-          document.getElementById("lat").value = "";
-          document.getElementById("lng").value = "";
+            container.classList.add("opacity-50");
+            inputs.classList.add("pointer-events-none");
+            document.getElementById("lat").value = "";
+            document.getElementById("lng").value = "";
         }
-      }
+    }
 
-      function startTimer() {
+    function startTimer() {
         if (timerInterval) clearInterval(timerInterval);
         const update = () => {
-          const diff = currentSessionEndTime - new Date().getTime();
-          if (diff <= 0) {
-            document.getElementById("modalTimer").innerText = "00:00";
-            document.getElementById("sidebarTimer").innerText = "00:00";
-            closeModal("qrModal");
-            stopSession(true);
-            return;
-          }
-          const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
-            s = Math.floor((diff % (1000 * 60)) / 1000),
-            str = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
-          document.getElementById("modalTimer").innerText = str;
-          document.getElementById("sidebarTimer").innerText = str;
+            const diff = currentSessionEndTime - new Date().getTime();
+            if (diff <= 0) {
+                document.getElementById("modalTimer").innerText = "00:00";
+                document.getElementById("sidebarTimer").innerText = "00:00";
+                closeModal("qrModal");
+                stopSession(true);
+                return;
+            }
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+                s = Math.floor((diff % (1000 * 60)) / 1000),
+                str = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+            document.getElementById("modalTimer").innerText = str;
+            document.getElementById("sidebarTimer").innerText = str;
         };
         update();
         timerInterval = setInterval(update, 1000);
-      }
+    }
 
-      function handleConfigChange() {
+    function handleConfigChange() {
         const idx = document.getElementById("groupSelect").value;
         if (idx === "") {
-          resetStats();
-          return;
+            resetStats();
+            return;
         }
         const group = groupsData[idx],
-          week = document.getElementById("weekSelect").value,
-          type = document.querySelector(
-            'input[name="classType"]:checked'
-          ).value;
+            week = document.getElementById("weekSelect").value,
+            type = document.querySelector(
+                'input[name="classType"]:checked'
+            ).value;
         document.getElementById(
-          "dashInfo"
+            "dashInfo"
         ).innerHTML = `<span class="w-2 h-2 rounded-full bg-indigo-500"></span> ${group.name} (W${week}-${type})`;
         updateDashboard(group.id, week, type);
-      }
+    }
 
-      function updateDashboard(sheetId, week, type) {
+    function updateDashboard(sheetId, week, type) {
         window.currentDashboardConfig = { sheetId, week, type };
+
+        // Show loading state
+        const tbody = document.getElementById("attendanceTable");
+        tbody.innerHTML = `
+           <tr>
+        <td colspan="5" class="text-center py-20 text-slate-400">
+          <div class="flex flex-col items-center gap-3">
+            <div class="relative">
+              <div class="w-12 h-12 border-4 border-indigo-200 rounded-full"></div>
+              <div class="w-12 h-12 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin absolute top-0 left-0"></div>
+            </div>
+            <p class="text-sm font-medium">กำลังโหลดข้อมูล...</p>
+          </div>
+        </td>
+      </tr>
+        `;
+
         google.script.run
-          .withSuccessHandler((res) => {
-            if (res.success) {
-              animateValue(
-                "statTotal",
-                parseInt(document.getElementById("statTotal").innerText),
-                res.total,
-                500
-              );
-              animateValue(
-                "statPresent",
-                parseInt(document.getElementById("statPresent").innerText),
-                res.present,
-                500
-              );
-              animateValue(
-                "statAbsent",
-                parseInt(document.getElementById("statAbsent").innerText),
-                res.absent,
-                500
-              );
-              const tbody = document.getElementById("attendanceTable");
-              if (res.studentList && res.studentList.length > 0) {
-                let html = "";
-                res.studentList.forEach((std, i) => {
-                  const isPresent = std.status === "Present";
-                  const statusBadge = isPresent
-                    ? `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 shadow-sm"><i class="fa-solid fa-check mr-1"></i> มาเรียน</span>`
-                    : `<button type="button" onclick="manualCheckIn('${std.id}','${std.name}');event.stopPropagation();" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white text-rose-500 border border-rose-200 hover:bg-rose-500 hover:text-white transition shadow-sm group-hover:scale-105"><i class="fa-solid fa-hand-pointer mr-1"></i> ขาดเรียน</button>`;
-                  html += `<tr class="transition border-b border-slate-50 last:border-0 ${
-                    isPresent ? "bg-emerald-50/40" : "hover:bg-rose-50/50 group"
-                  }"><td class="p-4 text-slate-400 font-mono text-xs text-center">${
-                    i + 1
-                  }</td><td class="p-4 font-mono ${
-                    isPresent ? "text-indigo-600 font-bold" : "text-slate-500"
-                  }">${std.id}</td><td class="p-4 font-medium text-slate-700">${
-                    std.name
-                  }</td><td class="p-4 text-center text-xs font-bold text-slate-400">${
-                    isPresent ? std.time : "-"
-                  }</td><td class="p-4 text-center">${statusBadge}</td></tr>`;
-                });
-                tbody.innerHTML = html;
-              } else
-                tbody.innerHTML =
-                  '<tr><td colspan="5" class="p-12 text-center text-slate-400 italic">...</td></tr>';
-            }
-          })
-          .getDashboardData(sheetId, week, type);
-      }
-      function resetStats() {
+            .withSuccessHandler((res) => {
+                if (res.success) {
+                    animateValue(
+                        "statTotal",
+                        parseInt(document.getElementById("statTotal").innerText),
+                        res.total,
+                        500
+                    );
+                    animateValue(
+                        "statPresent",
+                        parseInt(document.getElementById("statPresent").innerText),
+                        res.present,
+                        500
+                    );
+                    animateValue(
+                        "statAbsent",
+                        parseInt(document.getElementById("statAbsent").innerText),
+                        res.absent,
+                        500
+                    );
+                    const tbody = document.getElementById("attendanceTable");
+                    if (res.studentList && res.studentList.length > 0) {
+                        let html = "";
+                        res.studentList.forEach((std, i) => {
+                            const isPresent = std.status === "Present";
+                            const isLate = std.status === "Late";
+                            const isAbsent = std.status === "Absent";
+
+                            // สร้าง status badge ตามสถานะ
+                            let statusBadge;
+                            if (isPresent) {
+                                statusBadge = `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 shadow-sm"><i class="fa-solid fa-check mr-1"></i> มาเรียน</span>`;
+                            } else if (isLate) {
+                                statusBadge = `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 shadow-sm"><i class="fa-solid fa-clock mr-1"></i> มาสาย</span>`;
+                            } else {
+                                statusBadge = `<button type="button" onclick="manualCheckIn('${std.id}','${std.name}');event.stopPropagation();" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white text-rose-500 border border-rose-200 hover:bg-rose-500 hover:text-white transition shadow-sm group-hover:scale-105"><i class="fa-solid fa-hand-pointer mr-1"></i> ขาดเรียน</button>`;
+                            }
+
+                            // กำหนดสีพื้นหลังของแถว
+                            const rowBg = isPresent ? "bg-emerald-50/40" : isLate ? "bg-amber-50/40" : "hover:bg-rose-50/50 group";
+                            const idColor = (isPresent || isLate) ? "text-indigo-600 font-bold" : "text-slate-500";
+
+                            html += `<tr class="transition border-b border-slate-50 last:border-0 ${rowBg}"><td class="p-4 text-slate-400 font-mono text-xs text-center">${i + 1
+                                }</td><td class="p-4 font-mono ${idColor}">${std.id}</td><td class="p-4 font-medium text-slate-700">${std.name
+                                }</td><td class="p-4 text-center text-xs font-bold text-slate-400">${(isPresent || isLate) ? std.time : "-"
+                                }</td><td class="p-4 text-center">${statusBadge}</td></tr>`;
+                        });
+                        tbody.innerHTML = html;
+                    } else
+                        tbody.innerHTML =
+                            '<tr><td colspan="5" class="p-12 text-center text-slate-400 italic">...</td></tr>';
+                }
+            })
+            .getDashboardData(sheetId, week, type);
+    }
+
+    function resetStats() {
         document.getElementById("statTotal").innerText = "0";
         document.getElementById("statPresent").innerText = "0";
         document.getElementById("statAbsent").innerText = "0";
         document.getElementById("attendanceTable").innerHTML =
-          '<tr><td colspan="5" class="p-12 text-center text-slate-400 italic">เลือกกลุ่มเพื่อดูข้อมูล</td></tr>';
-      }
-      function copySessionLink() {
+            '<tr><td colspan="5" class="p-12 text-center text-slate-400 italic">เลือกกลุ่มเพื่อดูข้อมูล</td></tr>';
+    }
+    function copySessionLink() {
         const c = document.getElementById("sessionUrlInput");
         c.select();
         c.setSelectionRange(0, 99999);
         navigator.clipboard.writeText(c.value).then(() => {
-          const b = document.getElementById("btnCopy");
-          b.innerHTML = '<i class="fa-solid fa-check"></i>';
-          b.classList.replace("text-indigo-600", "text-emerald-600");
-          setTimeout(() => {
-            b.innerHTML = '<i class="fa-regular fa-copy"></i> Copy Link';
-            b.classList.replace("text-emerald-600", "text-indigo-600");
-          }, 2000);
+            const b = document.getElementById("btnCopy");
+            b.innerHTML = '<i class="fa-solid fa-check"></i>';
+            b.classList.replace("text-indigo-600", "text-emerald-600");
+            setTimeout(() => {
+                b.innerHTML = '<i class="fa-regular fa-copy"></i> Copy Link';
+                b.classList.replace("text-emerald-600", "text-indigo-600");
+            }, 2000);
         });
-      }
-      function getLoc() {
-        if (!document.getElementById("gpsToggle").checked) return;
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            document.getElementById("lat").value = pos.coords.latitude;
-            document.getElementById("lng").value = pos.coords.longitude;
-          },
-          (e) => showToast("GPS Error", "error")
-        );
-      }
-      function animateValue(id, s, e, d) {
+    }
+
+    function getLoc() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    document.getElementById("lat").value = pos.coords.latitude.toFixed(6);
+                    document.getElementById("lng").value = pos.coords.longitude.toFixed(6);
+                    showToast("ดึงพิกัด GPS สำเร็จ", "success");
+                },
+                (error) => {
+                    let errorMsg = "ไม่สามารถดึงพิกัด GPS ได้";
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMsg = "กรุณาอนุญาตการเข้าถึงตำแหน่ง";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMsg = "ไม่สามารถหาตำแหน่งได้";
+                            break;
+                        case error.TIMEOUT:
+                            errorMsg = "หมดเวลาในการดึงตำแหน่ง";
+                            break;
+                    }
+                    showToast(errorMsg, "error");
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        } else {
+            showToast("เบราว์เซอร์ไม่รองรับ GPS", "error");
+        }
+    }
+
+    function openGoogleMaps() {
+        const lat = document.getElementById("lat").value;
+        const lng = document.getElementById("lng").value;
+
+        if (!lat || !lng) {
+            showToast("กรุณาดึงพิกัด GPS ก่อน", "error");
+            return;
+        }
+
+        // Open Google Maps in new tab with the coordinates
+        const url = "https://www.google.com/maps?q=" + lat + "," + lng;
+        window.open(url, "_blank");
+    }
+    
+    function animateValue(id, s, e, d) {
         if (s === e) return;
         const obj = document.getElementById(id);
         let start = null;
         const step = (t) => {
-          if (!start) start = t;
-          const p = Math.min((t - start) / d, 1);
-          obj.innerHTML = Math.floor(p * (e - s) + s);
-          if (p < 1) window.requestAnimationFrame(step);
+            if (!start) start = t;
+            const p = Math.min((t - start) / d, 1);
+            obj.innerHTML = Math.floor(p * (e - s) + s);
+            if (p < 1) window.requestAnimationFrame(step);
         };
         window.requestAnimationFrame(step);
-      }
+    }
 </script>

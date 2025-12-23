@@ -1,12 +1,101 @@
-<div class="h-full lg:flex lg:gap-6 lg:p-6 overflow-hidden">
-  <!-- LEFT: Form Panel -->
+<style>
+  @keyframes entry {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-entry {
+    animation: entry 0.4s ease-out;
+  }
+
+  /* Toast Notification */
+  #toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    pointer-events: none;
+    width: 90%;
+    max-width: 350px;
+  }
+
+  .toast {
+    background: white;
+    border-left: 4px solid #4f46e5;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    transform: translateX(120%);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    pointer-events: auto;
+    width: 100%;
+  }
+
+  .toast.show {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .toast.success {
+    border-color: #10b981;
+  }
+
+  .toast.error {
+    border-color: #ef4444;
+  }
+
+  /* Modal Animation */
+  .modal-backdrop {
+    transition: opacity 0.3s ease-out;
+  }
+
+  .modal-content {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .modal-show .modal-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal-show .modal-content {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  .modal-hide .modal-backdrop {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .modal-hide .modal-content {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+</style>
+
+<div id="toast-container"></div>
+
+<div class="flex flex-col lg:flex-row h-auto lg:h-full w-full p-4 gap-4">
+  <!-- LEFT: Form Panel - Order 2 on mobile, order 1 on desktop -->
   <div
-    class="w-full lg:w-80 glass-panel shadow-xl flex flex-col rounded-3xl overflow-hidden shrink-0 h-auto lg:h-full order-1"
+    class="w-full lg:w-80 glass-panel shadow-xl flex flex-col rounded-3xl overflow-hidden shrink-0 h-auto lg:h-full order-2 lg:order-1 animate-entry"
   >
     <div class="lg:flex-1 lg:overflow-y-auto p-6 scroll-smooth">
       <!-- Header -->
       <div
-        class="flex items-center gap-2 mb-6 text-orange-500 text-xs font-bold uppercase tracking-wider"
+        class="flex items-center gap-2 mb-6 text-indigo-500 text-xs font-bold uppercase tracking-wider"
       >
         <i class="fa-solid fa-users-gear"></i> Scrum Grading
       </div>
@@ -16,12 +105,40 @@
         <label class="text-[10px] text-slate-400 font-bold ml-1 uppercase"
           >เลือกกลุ่มเรียน</label
         >
-        <select
-          id="groupSelect"
-          class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none transition font-medium text-slate-700"
+        <div class="relative">
+          <select
+            id="groupSelect"
+            class="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer shadow-sm text-slate-700 font-medium"
+          >
+            <option value="">-- กรุณาเลือก --</option>
+          </select>
+          <div
+            class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400"
+          >
+            <i class="fa-solid fa-chevron-down text-xs"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scrum Meeting Selection -->
+      <div class="mb-6">
+        <label class="text-[10px] text-slate-400 font-bold ml-1 uppercase"
+          >เลือก Scrum Meeting</label
         >
-          <option value="">-- กรุณาเลือก --</option>
-        </select>
+        <div class="relative">
+          <select
+            id="meetingSelect"
+            disabled
+            class="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer shadow-sm text-slate-700 font-medium"
+          >
+            <option value="">-- เลือกกลุ่มเรียนก่อน --</option>
+          </select>
+          <div
+            class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400"
+          >
+            <i class="fa-solid fa-chevron-down text-xs"></i>
+          </div>
+        </div>
       </div>
 
       <!-- Team Selection -->
@@ -29,23 +146,46 @@
         <label class="text-[10px] text-slate-400 font-bold ml-1 uppercase"
           >เลือกกลุ่มนักศึกษา</label
         >
-        <select
-          id="teamSelect"
-          disabled
-          class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none transition font-medium text-slate-700"
-        >
-          <option value="">-- เลือกกลุ่มเรียนก่อน --</option>
-        </select>
+        <div class="relative">
+          <select
+            id="teamSelect"
+            disabled
+            class="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer shadow-sm text-slate-700 font-medium"
+          >
+            <option value="">-- เลือก Meeting ก่อน --</option>
+          </select>
+          <div
+            class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400"
+          >
+            <i class="fa-solid fa-chevron-down text-xs"></i>
+          </div>
+        </div>
       </div>
 
-      <!-- Selected Team Info -->
+      <!-- Selected Info -->
       <div
-        id="selectedTeamCard"
-        class="hidden mb-6 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-100 p-4 rounded-2xl shadow-sm"
+        id="selectedInfoCard"
+        class="hidden mb-6 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 p-4 rounded-2xl shadow-sm animate-entry"
       >
         <div class="flex items-center gap-3 mb-3">
           <div
-            class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold shadow-md"
+            class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold shadow-md"
+          >
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <div class="flex-1 overflow-hidden">
+            <p class="text-xs text-slate-400 font-bold uppercase">Meeting</p>
+            <p
+              id="selectedMeetingName"
+              class="text-sm font-bold text-slate-800 truncate"
+            >
+              -
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 mb-3">
+          <div
+            class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold shadow-md"
           >
             <i class="fa-solid fa-users"></i>
           </div>
@@ -53,22 +193,27 @@
             <p class="text-xs text-slate-400 font-bold uppercase">กลุ่มที่</p>
             <p
               id="selectedTeamNumber"
-              class="text-lg font-bold text-slate-800 truncate"
+              class="text-sm font-bold text-slate-800 truncate"
             >
               -
             </p>
           </div>
         </div>
-        <div class="bg-white/60 p-3 rounded-xl">
-          <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">
-            ที่ปรึกษา
-          </p>
-          <p
-            id="selectedTeamAdvisor"
-            class="text-sm font-medium text-slate-700"
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold shadow-md"
           >
-            -
-          </p>
+            <i class="fa-solid fa-lightbulb"></i>
+          </div>
+          <div class="flex-1 overflow-hidden">
+            <p class="text-xs text-slate-400 font-bold uppercase">ที่ปรึกษา</p>
+            <p
+              id="selectedSupervisor"
+              class="text-sm font-bold text-slate-800 truncate"
+            >
+              -
+            </p>
+          </div>
         </div>
       </div>
 
@@ -89,135 +234,208 @@
     </div>
   </div>
 
-  <!-- RIGHT: Main Content -->
-  <div class="flex-1 flex flex-col overflow-hidden order-2 mt-6 lg:mt-0">
-    <!-- Dashboard -->
-    <div id="dashboard" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+  <!-- STATS CARDS SECTION - Order 1 on mobile, hidden on desktop (will show in main) -->
+  <div class="w-full lg:hidden order-1">
+    <div
+      id="dashboard"
+      class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 animate-entry"
+    >
       <!-- Total Students -->
       <div
-        class="glass-panel p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition"
+        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-indigo-300 transition-all duration-300 animate-entry"
       >
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-xs text-slate-400 font-bold uppercase">
-              นักศึกษาทั้งหมด
-            </p>
-            <p
-              id="totalStudents"
-              class="text-3xl font-bold text-slate-800 mt-1"
-            >
-              0
-            </p>
-          </div>
-          <div
-            class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center"
+        <div
+          class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-indigo-50/50 to-transparent"
+        ></div>
+        <div class="relative z-10">
+          <p
+            class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1"
           >
-            <i class="fa-solid fa-users text-xl"></i>
-          </div>
+            นักศึกษาทั้งหมด
+          </p>
+          <h3 id="totalStudents" class="text-4xl font-bold text-slate-700">
+            0
+          </h3>
+        </div>
+        <div
+          class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-500 shadow-sm group-hover:scale-110 transition duration-300"
+        >
+          <i class="fa-solid fa-users text-xl"></i>
         </div>
       </div>
 
       <!-- Graded -->
       <div
-        class="glass-panel p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition"
+        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-emerald-300 transition-all duration-300 animate-entry"
       >
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-xs text-slate-400 font-bold uppercase">
-              ให้คะแนนแล้ว
-            </p>
-            <p
-              id="gradedCount"
-              class="text-3xl font-bold text-emerald-600 mt-1"
-            >
-              0
-            </p>
-          </div>
-          <div
-            class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center"
+        <div
+          class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-emerald-50/50 to-transparent"
+        ></div>
+        <div class="relative z-10">
+          <p
+            class="text-emerald-500 text-[10px] font-bold uppercase tracking-wider mb-1"
           >
-            <i class="fa-solid fa-check-circle text-xl"></i>
-          </div>
+            ส่งแล้ว
+          </p>
+          <h3 id="gradedCount" class="text-4xl font-bold text-emerald-600">
+            0
+          </h3>
+        </div>
+        <div
+          class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm group-hover:scale-110 transition duration-300"
+        >
+          <i class="fa-solid fa-check-circle text-xl"></i>
         </div>
       </div>
 
       <!-- Not Graded -->
       <div
-        class="glass-panel p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition"
+        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-rose-300 transition-all duration-300 animate-entry"
       >
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-xs text-slate-400 font-bold uppercase">
-              ยังไม่ได้ให้คะแนน
-            </p>
-            <p
-              id="notGradedCount"
-              class="text-3xl font-bold text-rose-600 mt-1"
-            >
-              0
-            </p>
-          </div>
-          <div
-            class="w-12 h-12 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center"
+        <div
+          class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-rose-50/50 to-transparent"
+        ></div>
+        <div class="relative z-10">
+          <p
+            class="text-rose-500 text-[10px] font-bold uppercase tracking-wider mb-1"
           >
-            <i class="fa-solid fa-clock text-xl"></i>
-          </div>
+            ขาดส่ง
+          </p>
+          <h3 id="notGradedCount" class="text-4xl font-bold text-rose-600">
+            0
+          </h3>
+        </div>
+        <div
+          class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 shadow-sm group-hover:scale-110 transition duration-300"
+        >
+          <i class="fa-solid fa-clock text-xl"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Main Content - Order 3 on mobile, order 2 on desktop -->
+  <div
+    class="flex-1 flex flex-col overflow-hidden order-3 lg:order-2 mt-6 lg:mt-0"
+  >
+    <!-- Dashboard - Show only on desktop -->
+    <div
+      id="dashboard2"
+      class="hidden lg:grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 animate-entry"
+    >
+      <!-- Total Students -->
+      <div
+        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-indigo-300 transition-all duration-300 animate-entry"
+      >
+        <div
+          class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-indigo-50/50 to-transparent"
+        ></div>
+        <div class="relative z-10">
+          <p
+            class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1"
+          >
+            นักศึกษาทั้งหมด
+          </p>
+          <h3 id="totalStudents2" class="text-4xl font-bold text-slate-700">
+            0
+          </h3>
+        </div>
+        <div
+          class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-500 shadow-sm group-hover:scale-110 transition duration-300"
+        >
+          <i class="fa-solid fa-users text-xl"></i>
+        </div>
+      </div>
+
+      <!-- Graded -->
+      <div
+        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-emerald-300 transition-all duration-300 animate-entry"
+      >
+        <div
+          class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-emerald-50/50 to-transparent"
+        ></div>
+        <div class="relative z-10">
+          <p
+            class="text-emerald-500 text-[10px] font-bold uppercase tracking-wider mb-1"
+          >
+            ส่งแล้ว
+          </p>
+          <h3 id="gradedCount2" class="text-4xl font-bold text-emerald-600">
+            0
+          </h3>
+        </div>
+        <div
+          class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm group-hover:scale-110 transition duration-300"
+        >
+          <i class="fa-solid fa-check-circle text-xl"></i>
+        </div>
+      </div>
+
+      <!-- Not Graded -->
+      <div
+        class="glass-panel p-5 rounded-[20px] flex items-center justify-between relative overflow-hidden group hover:border-rose-300 transition-all duration-300 animate-entry"
+      >
+        <div
+          class="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-rose-50/50 to-transparent"
+        ></div>
+        <div class="relative z-10">
+          <p
+            class="text-rose-500 text-[10px] font-bold uppercase tracking-wider mb-1"
+          >
+            ขาดส่ง
+          </p>
+          <h3 id="notGradedCount2" class="text-4xl font-bold text-rose-600">
+            0
+          </h3>
+        </div>
+        <div
+          class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 shadow-sm group-hover:scale-110 transition duration-300"
+        >
+          <i class="fa-solid fa-clock text-xl"></i>
         </div>
       </div>
     </div>
 
     <!-- Student Table -->
     <div
-      class="flex-1 glass-panel rounded-3xl shadow-xl overflow-hidden flex flex-col"
+      class="glass-panel rounded-[24px] h-[500px] lg:h-[calc(100%-140px)] flex flex-col overflow-hidden relative shadow-xl animate-entry mb-4 lg:mb-0"
+      style="animation-delay: 0.2s"
     >
       <div
-        class="p-6 border-b border-slate-100 bg-gradient-to-r from-orange-50 to-amber-50"
+        class="p-5 border-b border-slate-100 flex justify-between items-center bg-white/60 backdrop-blur-md sticky top-0 z-10"
       >
-        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+        <h3 class="font-bold text-slate-700 flex items-center gap-3 text-lg">
           <div
-            class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center text-white shadow-md"
+            class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-600 p-2 rounded-lg text-white shadow-md shadow-indigo-500/20"
           >
-            <i class="fa-solid fa-table"></i>
+            <i class="fa-solid fa-table ml-1"></i>
           </div>
           รายละเอียดคะแนน Scrum
         </h3>
       </div>
-      <div class="flex-1 overflow-auto p-6">
-        <table class="w-full">
-          <thead class="sticky top-0 bg-slate-50 z-10">
-            <tr class="border-b-2 border-slate-200">
-              <th
-                class="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider"
-              >
-                รหัสนักศึกษา
-              </th>
-              <th
-                class="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider"
-              >
-                ชื่อ-นามสกุล
-              </th>
-              <th
-                class="text-center py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-32"
-              >
-                คะแนน 1
-              </th>
-              <th
-                class="text-center py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-32"
-              >
-                คะแนน 2
-              </th>
-              <th
-                class="text-center py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-24"
-              >
-                สถานะ
-              </th>
+      <div class="flex-1 overflow-y-auto student-list bg-white/40">
+        <table class="w-full text-left border-collapse">
+          <thead
+            class="bg-slate-50/80 text-slate-400 text-[10px] font-bold uppercase sticky top-0 z-10 backdrop-blur-sm shadow-sm"
+          >
+            <tr>
+              <th class="p-4 w-12 text-center">#</th>
+              <th class="p-4 w-28 lg:w-32">รหัสนักศึกษา</th>
+              <th class="p-4">ชื่อ-นามสกุล</th>
+              <th class="p-4 text-center w-24 lg:w-32">คะแนน 1</th>
+              <th class="p-4 text-center w-24 lg:w-32">คะแนน 2</th>
+              <th class="p-4 text-center w-32 lg:w-40">สถานะ</th>
             </tr>
           </thead>
           <tbody id="studentTableBody">
             <tr>
-              <td colspan="5" class="text-center py-20 text-slate-400">
-                <i class="fa-solid fa-inbox text-5xl mb-4 opacity-20"></i>
-                <p class="text-sm">กรุณาเลือกกลุ่มเรียนและกลุ่มนักศึกษา</p>
+              <td colspan="6" class="text-center py-20 text-slate-400 italic">
+                <div class="flex flex-col items-center gap-4 opacity-60">
+                  <i
+                    class="fa-solid fa-clipboard-question text-6xl text-slate-300"
+                  ></i>
+                  <span>กรุณาเลือกกลุ่มเรียนและกลุ่มนักศึกษา</span>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -230,253 +448,407 @@
 <!-- Score Modal -->
 <div
   id="scoreModal"
-  class="hidden fixed inset-0 z-50 flex items-center justify-center p-4"
+  class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-hide transition-all duration-300"
 >
   <div
-    class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-    onclick="closeScoreModal()"
+    class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm modal-backdrop"
   ></div>
   <div
-    class="bg-white rounded-[24px] shadow-2xl w-full max-w-md p-6 relative z-10 transform transition-all"
+    class="modal-content bg-white rounded-[32px] shadow-2xl w-full max-w-md relative z-10 border border-white/50 overflow-hidden flex flex-col"
   >
-    <div class="flex justify-between items-center mb-6">
-      <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-        <i class="fa-solid fa-star text-orange-500"></i> ให้คะแนน Scrum
+    <div
+      class="p-4 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-slate-50 to-slate-100"
+    >
+      <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+        <div
+          class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white shadow-md"
+        >
+          <i class="fa-solid fa-star"></i>
+        </div>
+        ให้คะแนน Scrum
       </h3>
       <button
         onclick="closeScoreModal()"
-        class="text-slate-400 hover:text-slate-600 transition"
+        class="w-10 h-10 bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-full flex items-center justify-center transition shadow-sm"
       >
-        <i class="fa-solid fa-xmark text-xl"></i>
+        <i class="fa-solid fa-xmark text-lg"></i>
       </button>
     </div>
 
-    <div
-      id="studentInfo"
-      class="bg-gradient-to-r from-orange-50 to-amber-50 p-4 rounded-xl mb-6"
-    >
-      <p class="text-xs text-slate-400 font-bold uppercase mb-1">นักศึกษา</p>
-      <p id="modalStudentId" class="text-sm font-mono text-slate-600"></p>
-      <p id="modalStudentName" class="text-lg font-bold text-slate-800"></p>
-    </div>
+    <div class="flex-1 overflow-y-auto p-6">
+      <div
+        id="studentInfo"
+        class="bg-gradient-to-r from-indigo-50 to-purple-50 p-4 rounded-xl mb-6 border border-indigo-100"
+      >
+        <p class="text-xs text-slate-400 font-bold uppercase mb-1">นักศึกษา</p>
+        <p id="modalStudentId" class="text-sm font-mono text-slate-600"></p>
+        <p id="modalStudentName" class="text-lg font-bold text-slate-800"></p>
+      </div>
 
-    <div class="space-y-4 mb-6">
-      <div>
-        <label
-          class="text-xs text-slate-400 font-bold ml-1 uppercase block mb-2"
-          >คะแนน 1 (1-5)</label
-        >
-        <div class="flex gap-2">
-          <button
-            onclick="setScore(1, 1)"
-            class="score-btn flex-1 py-3 rounded-xl border-2 border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition font-bold"
-            data-score="1"
-            data-field="1"
+      <div class="space-y-4 mb-6">
+        <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+          <label
+            class="block text-[10px] font-bold text-slate-400 mb-2 text-center uppercase tracking-widest"
+            >คะแนนช่องที่ 1</label
           >
-            1
-          </button>
-          <button
-            onclick="setScore(1, 2)"
-            class="score-btn flex-1 py-3 rounded-xl border-2 border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition font-bold"
-            data-score="2"
-            data-field="1"
+          <div class="flex justify-between gap-1">
+            <!-- Button Gen Logic: 1-5 -->
+            <button
+              onclick="setScore(1, 1)"
+              class="score-btn flex-1 lg:w-10 lg:h-10 lg:flex-none py-3 lg:py-0 rounded-lg border border-slate-200 font-bold text-slate-400 hover:border-indigo-300 hover:text-indigo-600 hover:bg-white hover:shadow-md transition-all duration-300 bg-slate-50 flex items-center justify-center text-sm"
+              data-score="1"
+              data-field="1"
+            >
+              1
+            </button>
+            <button
+              onclick="setScore(1, 2)"
+              class="score-btn flex-1 lg:w-10 lg:h-10 lg:flex-none py-3 lg:py-0 rounded-lg border border-slate-200 font-bold text-slate-400 hover:border-indigo-300 hover:text-indigo-600 hover:bg-white hover:shadow-md transition-all duration-300 bg-slate-50 flex items-center justify-center text-sm"
+              data-score="2"
+              data-field="1"
+            >
+              2
+            </button>
+            <button
+              onclick="setScore(1, 3)"
+              class="score-btn flex-1 lg:w-10 lg:h-10 lg:flex-none py-3 lg:py-0 rounded-lg border border-slate-200 font-bold text-slate-400 hover:border-indigo-300 hover:text-indigo-600 hover:bg-white hover:shadow-md transition-all duration-300 bg-slate-50 flex items-center justify-center text-sm"
+              data-score="3"
+              data-field="1"
+            >
+              3
+            </button>
+            <button
+              onclick="setScore(1, 4)"
+              class="score-btn flex-1 lg:w-10 lg:h-10 lg:flex-none py-3 lg:py-0 rounded-lg border border-slate-200 font-bold text-slate-400 hover:border-indigo-300 hover:text-indigo-600 hover:bg-white hover:shadow-md transition-all duration-300 bg-slate-50 flex items-center justify-center text-sm"
+              data-score="4"
+              data-field="1"
+            >
+              4
+            </button>
+            <button
+              onclick="setScore(1, 5)"
+              class="score-btn flex-1 lg:w-10 lg:h-10 lg:flex-none py-3 lg:py-0 rounded-lg border border-slate-200 font-bold text-slate-400 hover:border-indigo-300 hover:text-indigo-600 hover:bg-white hover:shadow-md transition-all duration-300 bg-slate-50 flex items-center justify-center text-sm"
+              data-score="5"
+              data-field="1"
+            >
+              5
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+          <label
+            class="block text-[10px] font-bold text-slate-400 mb-2 text-center uppercase tracking-widest"
+            >คะแนนช่องที่ 2</label
           >
-            2
-          </button>
-          <button
-            onclick="setScore(1, 3)"
-            class="score-btn flex-1 py-3 rounded-xl border-2 border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition font-bold"
-            data-score="3"
-            data-field="1"
-          >
-            3
-          </button>
-          <button
-            onclick="setScore(1, 4)"
-            class="score-btn flex-1 py-3 rounded-xl border-2 border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition font-bold"
-            data-score="4"
-            data-field="1"
-          >
-            4
-          </button>
-          <button
-            onclick="setScore(1, 5)"
-            class="score-btn flex-1 py-3 rounded-xl border-2 border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition font-bold"
-            data-score="5"
-            data-field="1"
-          >
-            5
-          </button>
+          <div class="flex justify-between gap-1">
+            <button
+              onclick="setScore(2, 1)"
+              class="score-btn flex-1 lg:w-10 lg:h-10 lg:flex-none py-3 lg:py-0 rounded-lg border border-slate-200 font-bold text-slate-400 hover:border-indigo-300 hover:text-indigo-600 hover:bg-white hover:shadow-md transition-all duration-300 bg-slate-50 flex items-center justify-center text-sm"
+              data-score="1"
+              data-field="2"
+            >
+              1
+            </button>
+            <button
+              onclick="setScore(2, 2)"
+              class="score-btn flex-1 lg:w-10 lg:h-10 lg:flex-none py-3 lg:py-0 rounded-lg border border-slate-200 font-bold text-slate-400 hover:border-indigo-300 hover:text-indigo-600 hover:bg-white hover:shadow-md transition-all duration-300 bg-slate-50 flex items-center justify-center text-sm"
+              data-score="2"
+              data-field="2"
+            >
+              2
+            </button>
+            <button
+              onclick="setScore(2, 3)"
+              class="score-btn flex-1 lg:w-10 lg:h-10 lg:flex-none py-3 lg:py-0 rounded-lg border border-slate-200 font-bold text-slate-400 hover:border-indigo-300 hover:text-indigo-600 hover:bg-white hover:shadow-md transition-all duration-300 bg-slate-50 flex items-center justify-center text-sm"
+              data-score="3"
+              data-field="2"
+            >
+              3
+            </button>
+            <button
+              onclick="setScore(2, 4)"
+              class="score-btn flex-1 lg:w-10 lg:h-10 lg:flex-none py-3 lg:py-0 rounded-lg border border-slate-200 font-bold text-slate-400 hover:border-indigo-300 hover:text-indigo-600 hover:bg-white hover:shadow-md transition-all duration-300 bg-slate-50 flex items-center justify-center text-sm"
+              data-score="4"
+              data-field="2"
+            >
+              4
+            </button>
+            <button
+              onclick="setScore(2, 5)"
+              class="score-btn flex-1 lg:w-10 lg:h-10 lg:flex-none py-3 lg:py-0 rounded-lg border border-slate-200 font-bold text-slate-400 hover:border-indigo-300 hover:text-indigo-600 hover:bg-white hover:shadow-md transition-all duration-300 bg-slate-50 flex items-center justify-center text-sm"
+              data-score="5"
+              data-field="2"
+            >
+              5
+            </button>
+          </div>
         </div>
       </div>
 
-      <div>
-        <label
-          class="text-xs text-slate-400 font-bold ml-1 uppercase block mb-2"
-          >คะแนน 2 (1-5)</label
-        >
-        <div class="flex gap-2">
-          <button
-            onclick="setScore(2, 1)"
-            class="score-btn flex-1 py-3 rounded-xl border-2 border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition font-bold"
-            data-score="1"
-            data-field="2"
-          >
-            1
-          </button>
-          <button
-            onclick="setScore(2, 2)"
-            class="score-btn flex-1 py-3 rounded-xl border-2 border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition font-bold"
-            data-score="2"
-            data-field="2"
-          >
-            2
-          </button>
-          <button
-            onclick="setScore(2, 3)"
-            class="score-btn flex-1 py-3 rounded-xl border-2 border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition font-bold"
-            data-score="3"
-            data-field="2"
-          >
-            3
-          </button>
-          <button
-            onclick="setScore(2, 4)"
-            class="score-btn flex-1 py-3 rounded-xl border-2 border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition font-bold"
-            data-score="4"
-            data-field="2"
-          >
-            4
-          </button>
-          <button
-            onclick="setScore(2, 5)"
-            class="score-btn flex-1 py-3 rounded-xl border-2 border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition font-bold"
-            data-score="5"
-            data-field="2"
-          >
-            5
-          </button>
-        </div>
-      </div>
+      <button
+        id="btnSaveScore"
+        onclick="saveScore()"
+        class="w-full btn-primary py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
+      >
+        <i class="fa-solid fa-save"></i> บันทึกคะแนน
+      </button>
     </div>
-
-    <button
-      onclick="saveScore()"
-      class="w-full btn-primary py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
-    >
-      <i class="fa-solid fa-save"></i> บันทึกคะแนน
-    </button>
   </div>
-</div>
 
-<script>
-  let currentGroupIndex = null;
-  let currentTeamData = null;
-  let currentStudentId = null;
-  let selectedScores = { score1: null, score2: null };
+  <script>
+    let currentGroupIndex = null;
+    let currentMeetingData = null;
+    let currentTeamNumber = null;
+    let currentStudentId = null;
+    let selectedScores = { score1: null, score2: null };
+    let groupsData = [];
+    let allStudentsData = []; // เก็บข้อมูลนักศึกษาทั้งหมด
 
-  window.addEventListener("DOMContentLoaded", function () {
-    loadGroups();
+    function showToast(msg, type = "success") {
+      const t = document.createElement("div");
+      t.className = `toast ${type}`;
+      t.innerHTML = `<i class="fa-solid ${
+        type === "success"
+          ? "fa-circle-check text-emerald-500"
+          : "fa-circle-xmark text-rose-500"
+      } text-xl"></i><div><h4 class="font-bold text-slate-800 text-sm">${
+        type === "success" ? "สำเร็จ" : "ข้อผิดพลาด"
+      }</h4><p class="text-xs text-slate-500">${msg}</p></div>`;
+      document.getElementById("toast-container").appendChild(t);
+      setTimeout(() => t.classList.add("show"), 10);
+      setTimeout(() => {
+        t.classList.remove("show");
+        setTimeout(() => t.remove(), 300);
+      }, 3000);
+    }
 
-    document
-      .getElementById("groupSelect")
-      .addEventListener("change", function () {
-        const idx = this.value;
-        if (idx !== "") {
-          currentGroupIndex = parseInt(idx);
-          loadTeams(idx);
-        } else {
-          resetTeamSelection();
-        }
-      });
+    window.addEventListener("DOMContentLoaded", function () {
+      loadGroups();
 
-    document
-      .getElementById("teamSelect")
-      .addEventListener("change", function () {
-        const teamNumber = this.value;
-        if (teamNumber !== "") {
-          loadTeamStudents(currentGroupIndex, teamNumber);
-        } else {
-          resetStudentList();
-        }
-      });
-  });
-
-  function loadGroups() {
-    google.script.run
-      .withSuccessHandler(function (groups) {
-        const select = document.getElementById("groupSelect");
-        select.innerHTML = '<option value="">-- กรุณาเลือก --</option>';
-        groups.forEach((g, i) => {
-          const opt = document.createElement("option");
-          opt.value = i;
-          opt.text = g.name;
-          select.appendChild(opt);
+      // Event: เลือกกลุ่มเรียน
+      document
+        .getElementById("groupSelect")
+        .addEventListener("change", function () {
+          const idx = this.value;
+          if (idx !== "") {
+            currentGroupIndex = parseInt(idx);
+            loadMeetings(idx);
+          } else {
+            resetAll();
+          }
         });
-      })
-      .getGroups();
-  }
 
-  function loadTeams(groupIndex) {
-    google.script.run
-      .withSuccessHandler(function (teams) {
-        const select = document.getElementById("teamSelect");
-        select.innerHTML = '<option value="">-- กรุณาเลือก --</option>';
-        select.disabled = false;
-
-        teams.forEach((team) => {
-          const opt = document.createElement("option");
-          opt.value = team.teamNumber;
-          opt.text = `กลุ่มที่ ${team.teamNumber} - ${team.advisor}`;
-          select.appendChild(opt);
+      // Event: เลือก Scrum Meeting
+      document
+        .getElementById("meetingSelect")
+        .addEventListener("change", function () {
+          const meetingData = this.value;
+          if (meetingData !== "") {
+            const meeting = JSON.parse(meetingData);
+            currentMeetingData = meeting;
+            loadAllStudents(currentGroupIndex, meeting);
+            loadTeams(currentGroupIndex); // โหลดรายการกลุ่มนักศึกษา
+          } else {
+            resetTeamSelection();
+          }
         });
-      })
-      .withFailureHandler(function (error) {
-        alert("เกิดข้อผิดพลาด: " + error.message);
-      })
-      .getScrumTeams(groupIndex);
-  }
 
-  function loadTeamStudents(groupIndex, teamNumber) {
-    google.script.run
-      .withSuccessHandler(function (data) {
-        currentTeamData = data;
-        displayTeamInfo(data);
-        displayStudents(data.students);
-        updateDashboard(data.students);
-      })
-      .withFailureHandler(function (error) {
-        alert("เกิดข้อผิดพลาด: " + error.message);
-      })
-      .getScrumTeamStudents(groupIndex, teamNumber);
-  }
+      // Event: เลือกกลุ่มนักศึกษา
+      document
+        .getElementById("teamSelect")
+        .addEventListener("change", function () {
+          const teamNumber = this.value;
+          if (teamNumber !== "") {
+            currentTeamNumber = teamNumber;
+            filterAndDisplayStudents(teamNumber);
+          } else {
+            resetStudentList();
+          }
+        });
+    });
 
-  function displayTeamInfo(data) {
-    document.getElementById("selectedTeamCard").classList.remove("hidden");
-    document.getElementById("selectedTeamNumber").textContent = data.teamNumber;
-    document.getElementById("selectedTeamAdvisor").textContent = data.advisor;
-  }
+    // Listen for groups update from Main.html
+    window.addEventListener("groupsUpdated", function (e) {
+      groupsData = e.detail;
+      updateGroupSelect();
+    });
 
-  function displayStudents(students) {
-    document.getElementById("studentListContainer").classList.remove("hidden");
-    document.getElementById("studentCount").textContent = students.length;
+    function loadGroups() {
+      google.script.run
+        .withSuccessHandler(function (data) {
+          groupsData = data;
+          updateGroupSelect();
+        })
+        .getGroups();
+    }
 
-    const list = document.getElementById("studentList");
-    const tbody = document.getElementById("studentTableBody");
+    function updateGroupSelect() {
+      const select = document.getElementById("groupSelect");
+      select.innerHTML = '<option value="">-- กรุณาเลือก --</option>';
+      groupsData.forEach((g, i) => {
+        const opt = document.createElement("option");
+        opt.value = i;
+        opt.text = g.name;
+        select.appendChild(opt);
+      });
+    }
 
-    list.innerHTML = "";
-    tbody.innerHTML = "";
+    function loadMeetings(groupIndex) {
+      const select = document.getElementById("meetingSelect");
+      select.innerHTML = '<option value="">กำลังโหลด...</option>';
+      select.disabled = true;
 
-    students.forEach((student, index) => {
-      // Sidebar list
-      const hasScore = student.score1 !== null && student.score2 !== null;
-      list.innerHTML += `
-        <div class="bg-white p-3 rounded-xl border border-slate-100 hover:border-orange-300 transition cursor-pointer" onclick="openScoreModal('${
+      google.script.run
+        .withSuccessHandler(function (meetings) {
+          select.innerHTML = '<option value="">-- กรุณาเลือก --</option>';
+          select.disabled = false;
+
+          meetings.forEach((meeting) => {
+            const opt = document.createElement("option");
+            opt.value = JSON.stringify(meeting);
+            opt.text = meeting.name;
+            select.appendChild(opt);
+          });
+        })
+        .withFailureHandler(function (error) {
+          select.innerHTML = '<option value="">เกิดข้อผิดพลาด</option>';
+          alert("เกิดข้อผิดพลาด: " + error.message);
+        })
+        .getScrumMeetings(groupIndex);
+    }
+
+    // โหลดรายการกลุ่มนักศึกษา (Teams) จาก Sheet Team
+    function loadTeams(groupIndex) {
+      const select = document.getElementById("teamSelect");
+      select.innerHTML = '<option value="">กำลังโหลด...</option>';
+      select.disabled = true;
+
+      google.script.run
+        .withSuccessHandler(function (teams) {
+          select.innerHTML = '<option value="">-- ทั้งหมด --</option>';
+          select.disabled = false;
+
+          teams.forEach((team) => {
+            const opt = document.createElement("option");
+            opt.value = team.teamNumber;
+            opt.text = `กลุ่มที่ ${team.teamNumber}`;
+            select.appendChild(opt);
+          });
+        })
+        .withFailureHandler(function (error) {
+          select.innerHTML = '<option value="">เกิดข้อผิดพลาด</option>';
+          alert("เกิดข้อผิดพลาด: " + error.message);
+        })
+        .getScrumTeams(groupIndex);
+    }
+
+    // เมื่อเลือก Meeting - โหลดข้อมูลทั้งหมดทันที
+    function loadAllStudents(groupIndex, meeting) {
+      if (!meeting) return;
+
+      // แสดงข้อมูล Meeting
+      document.getElementById("selectedInfoCard").classList.remove("hidden");
+      document.getElementById("selectedMeetingName").textContent = meeting.name;
+      document.getElementById("selectedTeamNumber").textContent = "";
+      document.getElementById("selectedSupervisor").textContent = "";
+
+      // แสดง loading ในตาราง
+      const tbody = document.getElementById("studentTableBody");
+      tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="text-center py-20 text-slate-400">
+          <div class="flex flex-col items-center gap-3">
+            <div class="relative">
+              <div class="w-12 h-12 border-4 border-indigo-200 rounded-full"></div>
+              <div class="w-12 h-12 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin absolute top-0 left-0"></div>
+            </div>
+            <p class="text-sm font-medium">กำลังโหลดข้อมูล...</p>
+          </div>
+        </td>
+      </tr>
+    `;
+
+      // ซ่อน student list (รอเลือกกลุ่ม)
+      document.getElementById("studentListContainer").classList.add("hidden");
+
+      // โหลดข้อมูลนักศึกษา "ทั้งหมด" (ส่ง null เป็น teamNumber)
+      google.script.run
+        .withSuccessHandler(function (data) {
+          // เก็บข้อมูลไว้ใช้งาน
+          allStudentsData = data.students;
+
+          // แสดงนักศึกษา "ทั้งหมด" ในตาราง
+          displayStudentsTable(allStudentsData);
+
+          // อัปเดต dashboard (แสดงทั้งหมดก่อน)
+          updateDashboard(allStudentsData);
+        })
+        .withFailureHandler(function (error) {
+          tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="text-center py-20 text-rose-400">
+              <i class="fa-solid fa-exclamation-triangle text-4xl mb-3 opacity-50"></i>
+              <p class="text-sm">เกิดข้อผิดพลาด: ${error.message}</p>
+            </td>
+          </tr>
+        `;
+        })
+        .getScrumStudents(groupIndex, meeting.columnIndex, null);
+    }
+
+    // Filter และแสดงนักศึกษาตามกลุ่มที่เลือก
+    function filterAndDisplayStudents(teamNumber) {
+      if (!currentMeetingData) {
+        return;
+      }
+
+      if (!teamNumber) {
+        // กรณีเลือก "ทั้งหมด" (value="")
+        document.getElementById("selectedTeamNumber").textContent = "";
+        document.getElementById("studentListContainer").classList.add("hidden");
+        // ถ้าต้องการให้แสดง cards ทั้งหมดด้วย ก็เปิดบรรทัดล่างนี้ (แต่ user อาจจะไม่ได้ขอ)
+        // displayStudentCards(allStudentsData);
+        return;
+      }
+
+      // Filter ข้อมูล locally จาก allStudentsData ที่โหลดมาแล้ว
+      const filteredStudents = allStudentsData.filter(
+        (s) => s.teamNumber === teamNumber
+      );
+
+      // แสดงข้อมูลกลุ่ม
+      document.getElementById("selectedTeamNumber").textContent = teamNumber;
+      document.getElementById("selectedSupervisor").textContent =
+        filteredStudents[0].advisor;
+
+      // แสดงใน card ด้านซ้าย (สำหรับกดให้คะแนน) เฉพาะกลุ่มที่เลือก
+      displayStudentCards(filteredStudents);
+
+      // *หมายเหตุ* ตารางยังคงแสดง "ทั้งหมด" ตามที่โหลดมาครั้งแรก (Scrum Meeting View)
+      // ถ้าต้องการให้ตารางเปลี่ยนตามกลุ่มด้วย ให้ uncomment บรรทัดล่าง
+      // displayStudentsTable(filteredStudents);
+    }
+
+    // แสดง Student Cards ด้านซ้าย (สำหรับกดให้คะแนน)
+    function displayStudentCards(students) {
+      document
+        .getElementById("studentListContainer")
+        .classList.remove("hidden");
+      document.getElementById("studentCount").textContent = students.length;
+
+      const list = document.getElementById("studentList");
+      list.innerHTML = "";
+
+      students.forEach((student, index) => {
+        const hasScore = student?.score1 && student?.score2;
+        list.innerHTML += `
+        <div class="bg-white p-3 rounded-xl border border-slate-100 hover:border-indigo-300 transition cursor-pointer" onclick="openScoreModal('${
           student.id
         }')">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2 flex-1 overflow-hidden">
-              <div class="w-8 h-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center text-xs font-bold shrink-0">
+              <div class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-xs font-bold shrink-0">
                 ${index + 1}
               </div>
               <div class="flex-1 overflow-hidden">
@@ -494,188 +866,289 @@
           </div>
         </div>
       `;
+      });
+    }
 
-      // Table row
-      tbody.innerHTML += `
-        <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
-          <td class="py-3 px-4">
-            <span class="font-mono text-sm text-slate-600">${student.id}</span>
+    // แสดงตารางนักศึกษาทั้งหมด
+    function displayStudentsTable(students) {
+      const tbody = document.getElementById("studentTableBody");
+      tbody.innerHTML = "";
+
+      students.forEach((student, index) => {
+        const hasScore = student?.score1 || student?.score2;
+
+        // กำหนดสีพื้นหลังและสีรหัสนักศึกษา
+        const rowBg = hasScore
+          ? "bg-emerald-50/40"
+          : "hover:bg-indigo-50/50 cursor-pointer group";
+        const idColor = hasScore
+          ? "text-indigo-600 font-bold"
+          : "text-slate-600";
+
+        tbody.innerHTML += `
+        <tr class="border-b border-slate-100 ${rowBg} transition">
+          <td class="p-4 text-center text-slate-400 font-mono text-xs">${
+            index + 1
+          }</td>
+          <td class="p-4">
+            <span class="font-mono text-sm ${idColor}">${student.id}</span>
           </td>
-          <td class="py-3 px-4">
-            <span class="font-medium text-slate-800">${student.name}</span>
+          <td class="p-4 font-medium text-sm text-slate-700">${student.name}
+            <span class="ml-2 text-xs text-slate-400">กลุ่ม ${
+              student.teamNumber
+            }</span>
           </td>
-          <td class="py-3 px-4 text-center">
+          <td class="p-4 text-center">
             <span class="inline-block px-3 py-1 rounded-lg ${
-              student.score1 !== null
-                ? "bg-orange-100 text-orange-700 font-bold"
-                : "bg-slate-100 text-slate-400"
-            }">${student.score1 !== null ? student.score1 : "-"}</span>
+              student?.score1 ? "bg-indigo-100 text-indigo-700 font-bold" : ""
+            }">${student?.score1 ? student?.score1 : ""}</span>
           </td>
-          <td class="py-3 px-4 text-center">
+          <td class="p-4 text-center">
             <span class="inline-block px-3 py-1 rounded-lg ${
-              student.score2 !== null
-                ? "bg-orange-100 text-orange-700 font-bold"
-                : "bg-slate-100 text-slate-400"
-            }">${student.score2 !== null ? student.score2 : "-"}</span>
+              student?.score2 ? "bg-indigo-100 text-indigo-700 font-bold" : ""
+            }">${student?.score2 ? student?.score2 : ""}</span>
           </td>
-          <td class="py-3 px-4 text-center">
+          <td class="p-4 text-center">
             ${
               hasScore
-                ? '<span class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold"><i class="fa-solid fa-check"></i> ให้แล้ว</span>'
-                : '<span class="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 text-slate-400 rounded-lg text-xs"><i class="fa-solid fa-clock"></i> รอ</span>'
+                ? '<span class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold"><i class="fa-solid fa-check"></i> ส่งแล้ว</span>'
+                : '<span class="inline-flex items-center gap-1 px-3 py-1 bg-rose-50 text-rose-500 rounded-full text-xs font-bold border border-rose-100">ขาดส่ง</span>'
             }
           </td>
         </tr>
       `;
-    });
-  }
-
-  function updateDashboard(students) {
-    const total = students.length;
-    const graded = students.filter(
-      (s) => s.score1 !== null && s.score2 !== null
-    ).length;
-    const notGraded = total - graded;
-
-    document.getElementById("totalStudents").textContent = total;
-    document.getElementById("gradedCount").textContent = graded;
-    document.getElementById("notGradedCount").textContent = notGraded;
-  }
-
-  function openScoreModal(studentId) {
-    currentStudentId = studentId;
-    const student = currentTeamData.students.find((s) => s.id === studentId);
-
-    document.getElementById("modalStudentId").textContent = student.id;
-    document.getElementById("modalStudentName").textContent = student.name;
-
-    selectedScores = {
-      score1: student.score1,
-      score2: student.score2,
-    };
-
-    // Highlight existing scores
-    document.querySelectorAll(".score-btn").forEach((btn) => {
-      btn.classList.remove("bg-orange-500", "text-white", "border-orange-500");
-      btn.classList.add("border-slate-200");
-    });
-
-    if (student.score1 !== null) {
-      const btn1 = document.querySelector(
-        `.score-btn[data-field="1"][data-score="${student.score1}"]`
-      );
-      if (btn1) {
-        btn1.classList.add("bg-orange-500", "text-white", "border-orange-500");
-        btn1.classList.remove("border-slate-200");
-      }
-    }
-
-    if (student.score2 !== null) {
-      const btn2 = document.querySelector(
-        `.score-btn[data-field="2"][data-score="${student.score2}"]`
-      );
-      if (btn2) {
-        btn2.classList.add("bg-orange-500", "text-white", "border-orange-500");
-        btn2.classList.remove("border-slate-200");
-      }
-    }
-
-    document.getElementById("scoreModal").classList.remove("hidden");
-  }
-
-  function closeScoreModal() {
-    document.getElementById("scoreModal").classList.add("hidden");
-  }
-
-  function setScore(field, score) {
-    if (field === 1) {
-      selectedScores.score1 = score;
-    } else {
-      selectedScores.score2 = score;
-    }
-
-    // Update button styles
-    document
-      .querySelectorAll(`.score-btn[data-field="${field}"]`)
-      .forEach((btn) => {
-        btn.classList.remove(
-          "bg-orange-500",
-          "text-white",
-          "border-orange-500"
-        );
-        btn.classList.add("border-slate-200");
       });
-
-    const selectedBtn = document.querySelector(
-      `.score-btn[data-field="${field}"][data-score="${score}"]`
-    );
-    selectedBtn.classList.add(
-      "bg-orange-500",
-      "text-white",
-      "border-orange-500"
-    );
-    selectedBtn.classList.remove("border-slate-200");
-  }
-
-  function saveScore() {
-    if (selectedScores.score1 === null || selectedScores.score2 === null) {
-      alert("กรุณาให้คะแนนทั้ง 2 ช่อง");
-      return;
     }
 
-    google.script.run
-      .withSuccessHandler(function (result) {
-        if (result.success) {
-          // Update local data
-          const student = currentTeamData.students.find(
-            (s) => s.id === currentStudentId
-          );
-          student.score1 = selectedScores.score1;
-          student.score2 = selectedScores.score2;
+    function updateDashboard(students) {
+      const total = students.length;
+      // นับจำนวนที่ให้คะแนนครบทั้ง 2 ช่อง (หรืออย่างน้อย 1 ช่อง ตาม logic user)
+      // User ใช้ student?.score1 && student?.score2 ใน Card display
+      // แต่ใน Table ใช้ student?.score1 || student?.score2 (ตอนแรก) เลวเปลี่ยนเป็น &&
+      // ยึดตาม && ละกันครับ คือต้องมีทั้งคู่
+      const graded = students.filter((s) => s.score1 || s.score2).length;
+      const notGraded = total - graded;
 
-          displayStudents(currentTeamData.students);
-          updateDashboard(currentTeamData.students);
-          closeScoreModal();
-
-          Swal.fire({
-            icon: "success",
-            title: "บันทึกสำเร็จ!",
-            text: "บันทึกคะแนนเรียบร้อยแล้ว",
-            timer: 1500,
-            showConfirmButton: false,
-          });
-        }
-      })
-      .withFailureHandler(function (error) {
-        alert("เกิดข้อผิดพลาด: " + error.message);
-      })
-      .saveScrumScore(
-        currentGroupIndex,
-        currentTeamData.teamNumber,
-        currentStudentId,
-        selectedScores.score1,
-        selectedScores.score2
+      // Update mobile cards
+      animateValue(
+        "totalStudents",
+        parseInt(document.getElementById("totalStudents").textContent) || 0,
+        total,
+        1000
       );
-  }
+      animateValue(
+        "gradedCount",
+        parseInt(document.getElementById("gradedCount").textContent) || 0,
+        graded,
+        1000
+      );
+      animateValue(
+        "notGradedCount",
+        parseInt(document.getElementById("notGradedCount").textContent) || 0,
+        notGraded,
+        1000
+      );
 
-  function resetTeamSelection() {
-    document.getElementById("teamSelect").innerHTML =
-      '<option value="">-- เลือกกลุ่มเรียนก่อน --</option>';
-    document.getElementById("teamSelect").disabled = true;
-    resetStudentList();
-  }
+      // Update desktop cards (if exists)
+      const totalStudents2 = document.getElementById("totalStudents2");
+      const gradedCount2 = document.getElementById("gradedCount2");
+      const notGradedCount2 = document.getElementById("notGradedCount2");
 
-  function resetStudentList() {
-    document.getElementById("selectedTeamCard").classList.add("hidden");
-    document.getElementById("studentListContainer").classList.add("hidden");
-    document.getElementById("studentTableBody").innerHTML = `
+      if (totalStudents2) {
+        animateValue(
+          "totalStudents2",
+          parseInt(totalStudents2.textContent) || 0,
+          total,
+          1000
+        );
+      }
+      if (gradedCount2) {
+        animateValue(
+          "gradedCount2",
+          parseInt(gradedCount2.textContent) || 0,
+          graded,
+          1000
+        );
+      }
+      if (notGradedCount2) {
+        animateValue(
+          "notGradedCount2",
+          parseInt(notGradedCount2.textContent) || 0,
+          notGraded,
+          1000
+        );
+      }
+    }
+
+    function animateValue(id, s, e, d) {
+      if (s === e) return;
+      const obj = document.getElementById(id);
+      let start = null;
+      const step = (t) => {
+        if (!start) start = t;
+        const p = Math.min((t - start) / d, 1);
+        obj.innerHTML = Math.floor(p * (e - s) + s);
+        if (p < 1) window.requestAnimationFrame(step);
+      };
+      window.requestAnimationFrame(step);
+    }
+
+    function openScoreModal(studentId) {
+      currentStudentId = studentId;
+      const student = allStudentsData.find((s) => s.id === studentId);
+
+      document.getElementById("modalStudentId").textContent = student.id;
+      document.getElementById("modalStudentName").textContent = student.name;
+
+      selectedScores = {
+        score1: student.score1,
+        score2: student.score2,
+      };
+
+      // Highlight existing scores
+      updateScoreButtons();
+
+      // Show modal with animation
+      const modal = document.getElementById("scoreModal");
+      modal.classList.remove("hidden");
+      setTimeout(() => {
+        modal.classList.remove("modal-hide");
+        modal.classList.add("modal-show");
+      }, 10);
+    }
+
+    function closeScoreModal() {
+      const modal = document.getElementById("scoreModal");
+      modal.classList.remove("modal-show");
+      modal.classList.add("modal-hide");
+      setTimeout(() => {
+        modal.classList.add("hidden");
+      }, 300);
+    }
+
+    function setScore(field, score) {
+      if (field === 1) {
+        selectedScores.score1 = selectedScores.score1 === score ? null : score; // Toggle
+      } else {
+        selectedScores.score2 = selectedScores.score2 === score ? null : score; // Toggle
+      }
+      updateScoreButtons();
+    }
+
+    function updateScoreButtons() {
+      const defaultClass =
+        "score-btn flex-1 lg:w-10 lg:h-10 lg:flex-none py-3 lg:py-0 rounded-lg border border-slate-200 font-bold text-slate-400 hover:border-indigo-300 hover:text-indigo-600 hover:bg-white hover:shadow-md transition-all duration-300 bg-slate-50 flex items-center justify-center text-sm";
+
+      // Field 1 (Indigo)
+      const activeClass1 =
+        "score-btn flex-1 lg:w-10 lg:h-10 lg:flex-none py-3 lg:py-0 rounded-lg font-bold transition-all duration-300 flex items-center justify-center text-sm bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-300 border-transparent transform";
+
+      // Field 2 (Purple)
+      const activeClass2 =
+        "score-btn flex-1 lg:w-10 lg:h-10 lg:flex-none py-3 lg:py-0 rounded-lg font-bold transition-all duration-300 flex items-center justify-center text-sm bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-300 border-transparent transform";
+
+      document.querySelectorAll(".score-btn").forEach((btn) => {
+        const field = parseInt(btn.dataset.field);
+        const score = parseInt(btn.dataset.score);
+        const currentScore =
+          field === 1 ? selectedScores.score1 : selectedScores.score2;
+
+        if (currentScore === score) {
+          btn.className = field === 1 ? activeClass1 : activeClass2;
+        } else {
+          btn.className = defaultClass;
+        }
+      });
+    }
+
+    function saveScore() {
+      if (selectedScores.score1 === null || selectedScores.score2 === null) {
+        alert("กรุณาให้คะแนนทั้ง 2 ช่อง");
+        return;
+      }
+
+      const btn = document.getElementById("btnSaveScore");
+      btn.disabled = true;
+      btn.innerHTML = `
+      <div class="flex items-center gap-3">
+            <div class="relative">
+              <i class="fa-solid fa-circle-notch fa-spin animate-spin"></i>
+            </div>
+            <p class="text-sm font-medium">กำลังบันทึก...</p>
+      </div>
+    `;
+
+      google.script.run
+        .withSuccessHandler(function (result) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-save"></i> บันทึกคะแนน';
+
+          if (result.success) {
+            // Update local data
+            const student = allStudentsData.find(
+              (s) => s.id === currentStudentId
+            );
+            if (student) {
+              student.score1 = selectedScores.score1;
+              student.score2 = selectedScores.score2;
+            }
+
+            // Refresh display
+            let teamNumber = document.getElementById("teamSelect").value;
+            const filteredStudents = allStudentsData.filter(
+              (s) => s.teamNumber === teamNumber
+            );
+
+            displayStudentCards(filteredStudents);
+            displayStudentsTable(allStudentsData);
+            updateDashboard(allStudentsData);
+
+            closeScoreModal();
+
+            // Toast Notification (แบบ PageCheckIn)
+            showToast(`บันทึกสำเร็จ: ${student.name}`, "success");
+          }
+        })
+        .withFailureHandler(function (error) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-save"></i> บันทึกคะแนน';
+          showToast("เกิดข้อผิดพลาด: " + error.message, "error");
+        })
+        .saveScrumScore(
+          currentGroupIndex,
+          currentMeetingData.columnIndex,
+          currentStudentId,
+          selectedScores.score1,
+          selectedScores.score2
+        );
+    }
+
+    function resetAll() {
+      document.getElementById("meetingSelect").innerHTML =
+        '<option value="">-- เลือกกลุ่มเรียนก่อน --</option>';
+      document.getElementById("meetingSelect").disabled = true;
+      resetTeamSelection();
+    }
+
+    function resetTeamSelection() {
+      document.getElementById("teamSelect").innerHTML =
+        '<option value="">-- เลือก Meeting ก่อน --</option>';
+      document.getElementById("teamSelect").disabled = true;
+      resetStudentList();
+    }
+
+    function resetStudentList() {
+      document.getElementById("selectedInfoCard").classList.add("hidden");
+      document.getElementById("studentListContainer").classList.add("hidden");
+      document.getElementById("studentTableBody").innerHTML = `
       <tr>
         <td colspan="5" class="text-center py-20 text-slate-400">
           <i class="fa-solid fa-inbox text-5xl mb-4 opacity-20"></i>
-          <p class="text-sm">กรุณาเลือกกลุ่มเรียนและกลุ่มนักศึกษา</p>
+          <p class="text-sm">กรุณาเลือกกลุ่มเรียน, Scrum Meeting และกลุ่มนักศึกษา</p>
         </td>
       </tr>
     `;
-    updateDashboard([]);
-  }
-</script>
+      updateDashboard([]);
+    }
+  </script>
+</div>
