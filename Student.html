@@ -267,6 +267,7 @@
 
     <script>
       let sessionToken = "<?= token ?>";
+      let requireGPS = <?= requireGPS ?>; // เพิ่มตัวแปร requireGPS
 
       window.onload = function () {
         if (!sessionToken || sessionToken === "") {
@@ -304,67 +305,144 @@
         // 2. Loading State (จัดกึ่งกลาง + Spinner)
         btn.disabled = true;
         btn.classList.add("cursor-not-allowed", "opacity-80");
-        btn.innerHTML = `
-        <div class="flex items-center justify-center gap-3 w-full">
-            <i class="fa-solid fa-circle-notch fa-spin text-xl"></i>
-            <span>กำลังตรวจสอบ...</span>
-        </div>
-      `;
 
         resultArea.classList.add("hidden");
 
+        // *** เช็คว่าต้องใช้ GPS หรือไม่ ***
+        if (!requireGPS) {
+          // ถ้าไม่ต้องใช้ GPS ให้ส่งค่า null สำหรับพิกัด
+          btn.innerHTML = `
+          <div class="flex items-center justify-center gap-3 w-full">
+              <i class="fa-solid fa-circle-notch fa-spin text-xl"></i>
+              <span>กำลังตรวจสอบ...</span>
+          </div>
+        `;
+          submitCheckIn(stdId, null, null, btn);
+          return;
+        }
+
+        // *** ถ้าต้องใช้ GPS ให้แสดงข้อความขออนุญาตก่อน ***
+        btn.innerHTML = `
+        <div class="flex items-center justify-center gap-3 w-full">
+            <i class="fa-solid fa-location-crosshairs fa-pulse text-xl"></i>
+            <span>กรุณาอนุญาต GPS...</span>
+        </div>
+      `;
+
+        // ถ้าต้องใช้ GPS ให้ดึงพิกัดก่อน
         if (!navigator.geolocation) {
           showResult(false, "GPS Error", "อุปกรณ์ไม่รองรับ GPS");
           resetButton(btn);
           return;
         }
 
+        // *** เรียก getCurrentPosition ทันที เพื่อให้ popup ขึ้น ***
         navigator.geolocation.getCurrentPosition(
           (pos) => {
-            google.script.run
-              .withSuccessHandler((res) => {
-                if (res.success) {
-                  // 3. บันทึกลงเครื่องว่าเช็คแล้ว (ป้องกันการใช้เครื่องเดิมเช็คให้เพื่อน)
-                  localStorage.setItem("CHECKED_IN_" + sessionToken, "true");
-
-                  if (res.already) {
-                    // กรณี Server บอกว่าเช็คไปแล้ว (อาจจะใช้เครื่องอื่นเช็ค ID นี้)
-                    showResult(
-                      true,
-                      "เช็คชื่อไปแล้ว",
-                      "คุณได้ทำการเช็คชื่อไปก่อนหน้านี้"
-                    );
-                    lockUIAsSuccess("เช็คชื่อแล้ว");
-                  } else {
-                    // เช็คชื่อสำเร็จครั้งแรก
-                    triggerConfetti();
-                    showResult(
-                      true,
-                      "เช็คชื่อสำเร็จ!",
-                      "บันทึกเวลาเรียบร้อยแล้ว"
-                    );
-                    lockUIAsSuccess("เรียบร้อย");
-                  }
-                } else {
-                  showResult(false, "เกิดข้อผิดพลาด", res.msg);
-                  resetButton(btn);
-                }
-              })
-              .checkInStudent(
-                stdId,
-                pos.coords.latitude,
-                pos.coords.longitude,
-                sessionToken
-              );
+            // เมื่อได้พิกัดแล้ว แสดง loading
+            btn.innerHTML = `
+            <div class="flex items-center justify-center gap-3 w-full">
+                <i class="fa-solid fa-circle-notch fa-spin text-xl"></i>
+                <span>กำลังตรวจสอบ...</span>
+            </div>
+          `;
+            submitCheckIn(stdId, pos.coords.latitude, pos.coords.longitude, btn);
           },
           (err) => {
             let msg = "ระบุตำแหน่งไม่ได้";
-            if (err.code == 1) msg = "กรุณากด 'อนุญาต' (Allow) GPS";
+            if (err.code == 1) {
+              msg = "คุณปฏิเสธการเข้าถึงตำแหน่ง กรุณาอนุญาต GPS ในการตั้งค่าเบราว์เซอร์";
+            } else if (err.code == 2) {
+              msg = "ไม่สามารถระบุตำแหน่งได้ กรุณาเปิด GPS";
+            } else if (err.code == 3) {
+              msg = "หมดเวลาในการรอตำแหน่ง กรุณาลองใหม่";
+            }
             showResult(false, "GPS Error", msg);
             resetButton(btn);
           },
-          { enableHighAccuracy: true }
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
+      }
+
+      // ฟังก์ชันสำหรับส่งข้อมูลเช็คชื่อ
+      function submitCheckIn(stdId, lat, lng, btn) {
+        google.script.run
+          .withSuccessHandler((res) => {
+            if (res.success) {
+              // 3. บันทึกลงเครื่องว่าเช็คแล้ว (ป้องกันการใช้เครื่องเดิมเช็คให้เพื่อน)
+              localStorage.setItem("CHECKED_IN_" + sessionToken, "true");
+
+              if (res.already) {
+                // กรณี Server บอกว่าเช็คไปแล้ว (อาจจะใช้เครื่องอื่นเช็ค ID นี้)
+                showResult(
+                  true,
+                  "เช็คชื่อไปแล้ว",
+                  "คุณได้ทำการเช็คชื่อไปก่อนหน้านี้"
+                );
+                lockUIAsSuccess("เช็คชื่อแล้ว");
+              } else {
+                // เช็คชื่อสำเร็จครั้งแรก - เล่นเสียงและ confetti
+                playSuccessSound();
+                triggerConfetti();
+                showResult(
+                  true,
+                  "เช็คชื่อสำเร็จ!",
+                  "บันทึกเวลาเรียบร้อยแล้ว"
+                );
+                lockUIAsSuccess("เรียบร้อย");
+              }
+            } else {
+              showResult(false, "เกิดข้อผิดพลาด", res.msg);
+              resetButton(btn);
+            }
+          })
+          .checkInStudent(stdId, lat, lng, sessionToken);
+      }
+
+      // ฟังก์ชันเล่นเสียงเมื่อเช็คชื่อสำเร็จ
+      function playSuccessSound() {
+        try {
+          // ตัวเลือก 1: ใช้ URL ของเสียง (ถ้ามี)
+          // แก้ไข URL ด้านล่างนี้เป็น URL ของเสียงที่คุณต้องการ
+          // แปลงจาก Google Drive sharing link เป็น direct download link
+          const soundUrl = "https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3";
+
+          if (soundUrl) {
+            const audio = new Audio(soundUrl);
+            audio.volume = 0.5;
+            audio.play().catch(e => console.log("Cannot play sound:", e));
+          } else {
+            // ตัวเลือก 2: สร้างเสียงด้วย Web Audio API
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+            // สร้างเสียง "ding" ที่ไพเราะ
+            const playTone = (frequency, startTime, duration) => {
+              const oscillator = audioContext.createOscillator();
+              const gainNode = audioContext.createGain();
+
+              oscillator.connect(gainNode);
+              gainNode.connect(audioContext.destination);
+
+              oscillator.frequency.value = frequency;
+              oscillator.type = 'sine';
+
+              gainNode.gain.setValueAtTime(0, startTime);
+              gainNode.gain.linearRampToValueAtTime(0.3, startTime + 0.01);
+              gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+
+              oscillator.start(startTime);
+              oscillator.stop(startTime + duration);
+            };
+
+            const now = audioContext.currentTime;
+            // เล่น 3 โน้ต: C-E-G (คอร์ด C major)
+            playTone(523.25, now, 0.15);        // C5
+            playTone(659.25, now + 0.1, 0.15);  // E5
+            playTone(783.99, now + 0.2, 0.3);   // G5
+          }
+        } catch (e) {
+          console.log("Audio not supported:", e);
+        }
       }
 
       // ฟังก์ชันล็อกหน้าจอเมื่อสำเร็จ
@@ -375,7 +453,7 @@
         btn.disabled = true;
         btn.innerHTML = `
             <div class="flex items-center justify-center gap-2 w-full">
-                <i class="fa-solid fa-circle-check"></i> 
+                <i class="fa-solid fa-circle-check"></i>
                 <span>${btnText}</span>
             </div>`;
         btn.classList.replace("bg-indigo-600", "bg-green-500");

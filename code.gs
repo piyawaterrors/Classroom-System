@@ -4,13 +4,14 @@
 function doGet(e) {
   var tokenFromUrl = e.parameter.token;
 
-  // CASE A: นักเรียน (เหมือนเดิม)
+  // CASE A: นักเรียน (เพิ่ม GPS parameter)
   if (tokenFromUrl) {
     var template = HtmlService.createTemplateFromFile("Student");
     template.token = tokenFromUrl;
     template.groupName = e.parameter.group || "";
     template.week = e.parameter.week || "";
     template.type = e.parameter.type || "";
+    template.requireGPS = e.parameter.gps === "1"; // เพิ่ม GPS parameter
 
     return template
       .evaluate()
@@ -197,10 +198,10 @@ function createSession(data) {
   // เช็คว่า URL มี ? อยู่แล้วหรือไม่
   const separator = baseUrl.includes("?") ? "&" : "?";
 
-  // *** จุดสำคัญ: ต่อ String พารามิเตอร์เข้าไป ***
+  // *** จุดสำคัญ: ต่อ String พารามิเตอร์เข้าไป (เพิ่ม gps parameter) ***
   const params = `token=${sessionToken}&group=${encodeURIComponent(
     data.groupName
-  )}&week=${data.week}&type=${data.type}`;
+  )}&week=${data.week}&type=${data.type}&gps=${data.requireGPS ? "1" : "0"}`;
   const sessionUrl = baseUrl + separator + params;
 
   return {
@@ -229,10 +230,12 @@ function getSessionStatus() {
   const baseUrl = ScriptApp.getService().getUrl();
   const separator = baseUrl.includes("?") ? "&" : "?";
 
-  // *** จุดสำคัญ: สร้าง URL ให้ครบเหมือนตอน create ***
+  // *** จุดสำคัญ: สร้าง URL ให้ครบเหมือนตอน create (เพิ่ม gps parameter) ***
   const params = `token=${session.token}&group=${encodeURIComponent(
     session.groupName
-  )}&week=${session.week}&type=${session.type}`;
+  )}&week=${session.week}&type=${session.type}&gps=${
+    session.requireGPS ? "1" : "0"
+  }`;
   const sessionUrl = baseUrl + separator + params;
 
   return {
