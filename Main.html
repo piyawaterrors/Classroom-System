@@ -559,28 +559,36 @@
         list.innerHTML = "";
 
         data.forEach((g, i) => {
+          const isActive = g.isActive !== false; // Default to true
           list.innerHTML += `
-            <li class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm group hover:border-indigo-300 transition mb-2">
+            <li class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm group hover:border-indigo-300 transition mb-2 ${!isActive ? 'opacity-60 bg-slate-50' : ''}">
               <div class="flex items-center gap-3 overflow-hidden cursor-pointer w-full" onclick="editGroupByIndex(${i})">
                 <div class="bg-indigo-50 text-indigo-600 w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition group-hover:bg-indigo-600 group-hover:text-white group-hover:shadow-md">
                   <i class="fa-solid fa-pen"></i>
                 </div>
                 <div class="flex flex-col truncate">
-                  <span class="text-sm font-bold text-slate-700 truncate group-hover:text-indigo-600 transition">${g.name
-            }</span>
-                  <span class="text-[10px] text-slate-400 font-mono truncate">ID: ${g.id.substring(
-              0,
-              8
-            )}...</span>
+                  <span class="text-sm font-bold text-slate-700 truncate group-hover:text-indigo-600 transition ${!isActive ? 'line-through' : ''}">${g.name}</span>
+                  <span class="text-[10px] text-slate-400 font-mono truncate">ID: ${g.id.substring(0, 8)}...</span>
                 </div>
               </div>
-              <button 
-                type="button" 
-                onclick="confirmDeleteGroup(${i}, () => deleteGroupByIndex(${i}))" 
-                class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition ml-2"
-              >
-                <i class="fa-solid fa-trash"></i>
-              </button>
+              <div class="flex items-center gap-2">
+                <!-- Status Toggle -->
+                <button 
+                  type="button"
+                  onclick="toggleGroupStatusUI(${i})"
+                  class="w-10 h-6 rounded-full transition-colors duration-200 relative shrink-0 ${isActive ? 'bg-indigo-500' : 'bg-slate-300'}"
+                >
+                  <div class="absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ${isActive ? 'translate-x-4' : ''}"></div>
+                </button>
+
+                <button 
+                  type="button" 
+                  onclick="confirmDeleteGroup(${i}, () => deleteGroupByIndex(${i}))" 
+                  class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition ml-2"
+                >
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
             </li>
           `;
         });
@@ -657,6 +665,8 @@
           </div>
         `;
 
+        const currentIsActive = currentGroupsData[index] ? currentGroupsData[index].isActive : true;
+
         google.script.run
           .withSuccessHandler((res) => {
             btn.disabled = false;
@@ -673,7 +683,29 @@
               showToast(res.msg, "error");
             }
           })
-          .updateGroup(parseInt(index), name, id);
+          .updateGroup(parseInt(index), name, id, currentIsActive);
+      }
+
+      function toggleGroupStatusUI(index) {
+        if (!currentGroupsData[index]) return;
+        const g = currentGroupsData[index];
+        const newStatus = g.isActive === false ? true : false;
+        
+        // Optimistic UI update
+        g.isActive = newStatus;
+        renderGroups(currentGroupsData);
+
+        google.script.run
+          .withSuccessHandler((res) => {
+            if (res.success) {
+              renderGroups(res.data);
+              showToast(`เปลี่ยนสถานะกลุ่ม ${g.name} เป็น ${newStatus ? 'เปิด' : 'ปิด'}`);
+            } else {
+              showToast(res.msg, "error");
+              loadGroups(); // Rollback
+            }
+          })
+          .updateGroup(index, g.name, g.id, newStatus);
       }
 
       function editGroupByIndex(index) {

@@ -66,7 +66,7 @@ function saveGroup(name, id) {
     return { success: false, msg: "Spreadsheet ID ไม่ถูกต้อง" };
   }
   let groups = getGroups();
-  groups.push({ name: name, id: id });
+  groups.push({ name: name, id: id, isActive: true });
   PropertiesService.getScriptProperties().setProperty(
     "SAVED_GROUPS",
     JSON.stringify(groups)
@@ -74,14 +74,23 @@ function saveGroup(name, id) {
   return { success: true, data: groups };
 }
 
-function updateGroup(index, name, id) {
+function updateGroup(index, name, id, isActive) {
   try {
     SpreadsheetApp.openById(id);
   } catch (e) {
     return { success: false, msg: "Spreadsheet ID ไม่ถูกต้อง" };
   }
   let groups = getGroups();
-  groups[index] = { name: name, id: id };
+  if (groups[index]) {
+    groups[index].name = name;
+    groups[index].id = id;
+    // ป้องกันกรณีส่ง isActive เป็น undefined/null
+    if (isActive !== undefined) {
+      groups[index].isActive = isActive;
+    } else if (groups[index].isActive === undefined) {
+      groups[index].isActive = true;
+    }
+  }
   PropertiesService.getScriptProperties().setProperty(
     "SAVED_GROUPS",
     JSON.stringify(groups)

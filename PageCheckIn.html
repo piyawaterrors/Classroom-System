@@ -658,10 +658,12 @@
         const select = document.getElementById("groupSelect");
         select.innerHTML = '<option value="">-- กรุณาเลือก --</option>';
         groupsData.forEach((g, i) => {
-            let opt = document.createElement("option");
-            opt.value = i;
-            opt.text = g.name;
-            select.appendChild(opt);
+            if (g.isActive !== false) {
+                let opt = document.createElement("option");
+                opt.value = i;
+                opt.text = g.name;
+                select.appendChild(opt);
+            }
         });
     }
 

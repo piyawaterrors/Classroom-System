@@ -490,10 +490,12 @@
         labGroups = data;
         const select = document.getElementById("labGroupSelect");
         data.forEach((g, i) => {
-          let opt = document.createElement("option");
-          opt.value = i;
-          opt.text = g.name;
-          select.appendChild(opt);
+          if (g.isActive !== false) {
+            let opt = document.createElement("option");
+            opt.value = i;
+            opt.text = g.name;
+            select.appendChild(opt);
+          }
         });
       })
       .getGroups();
