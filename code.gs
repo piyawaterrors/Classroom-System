@@ -866,3 +866,111 @@ function saveProjectReview(sheetId, studentId, checkboxValues) {
     return { success: false, msg: "Error: " + e.message };
   }
 }
+
+// -----------------------------------------------------------
+// 9. FINAL EXAM SYSTEM
+// -----------------------------------------------------------
+
+/**
+ * ดึงข้อมูลนักศึกษาจาก Sheet "Final Exam"
+ * อ่านจาก B4 (รหัสนักศึกษา) และ C4 (ชื่อ)
+ * พร้อมคะแนนจาก F4-P4 (11 คอลัมน์)
+ */
+function getFinalExamData(sheetId) {
+  try {
+    const ss = SpreadsheetApp.openById(sheetId);
+    const sheet = ss.getSheetByName("Final Exam");
+
+    if (!sheet) {
+      return { success: false, msg: "ไม่พบ Sheet 'Final Exam'" };
+    }
+
+    const lastRow = sheet.getLastRow();
+
+    if (lastRow < 4) {
+      return { success: true, students: [] };
+    }
+
+    // ดึงข้อมูลนักศึกษา (B4:C และ F:P สำหรับ score data)
+    const studentData = sheet.getRange(4, 2, lastRow - 3, 2).getValues(); // B4:C (column 2,3)
+    const scoreData = sheet.getRange(4, 6, lastRow - 3, 11).getValues(); // F4:P (11 columns)
+
+    const students = [];
+
+    for (let i = 0; i < studentData.length; i++) {
+      const id = String(studentData[i][0]).trim();
+      const name = String(studentData[i][1]).trim();
+
+      if (id === "" || name === "") continue;
+
+      // ตรวจสอบว่ามีข้อมูลคะแนนหรือไม่ (ถ้ามีอย่างน้อย 1 ช่อง = ตรวจแล้ว)
+      const scores = scoreData[i];
+      const hasAnyScore = scores.some(
+        (val) => val !== "" && val !== null && !isNaN(parseFloat(val))
+      );
+
+      students.push({
+        id: id,
+        name: name,
+        reviewed: hasAnyScore,
+        scores: scores.map((val) =>
+          val === "" || val === null ? 0 : parseFloat(val)
+        ),
+      });
+    }
+
+    return { success: true, students: students };
+  } catch (e) {
+    return { success: false, msg: "Error: " + e.message };
+  }
+}
+
+/**
+ * บันทึกข้อมูล Final Exam
+ * @param {string} sheetId - ID ของ Spreadsheet
+ * @param {string} studentId - รหัสนักศึกษา
+ * @param {Array<number>} scoreValues - Array ของคะแนน (11 ตัว)
+ */
+function saveFinalExam(sheetId, studentId, scoreValues) {
+  try {
+    const ss = SpreadsheetApp.openById(sheetId);
+    const sheet = ss.getSheetByName("Final Exam");
+
+    if (!sheet) {
+      return { success: false, msg: "ไม่พบ Sheet 'Final Exam'" };
+    }
+
+    const lastRow = sheet.getLastRow();
+
+    if (lastRow < 4) {
+      return { success: false, msg: "ไม่พบข้อมูลนักศึกษา" };
+    }
+
+    // ค้นหาแถวของนักศึกษา (จากคอลัมน์ B)
+    const ids = sheet
+      .getRange(4, 2, lastRow - 3, 1)
+      .getValues()
+      .flat()
+      .map(String);
+
+    const idx = ids.indexOf(String(studentId));
+
+    if (idx === -1) {
+      return { success: false, msg: "ไม่พบรหัสนักศึกษา: " + studentId };
+    }
+
+    const targetRow = 4 + idx;
+
+    // บันทึกคะแนนลง F:P (11 columns)
+    // F4-P4 ตามลำดับของนักศึกษา
+    for (let i = 0; i < scoreValues.length && i < 11; i++) {
+      const col = 6 + i; // Column F = 6, G = 7, ..., P = 16
+      const value = scoreValues[i] || 0;
+      sheet.getRange(targetRow, col).setValue(value);
+    }
+
+    return { success: true };
+  } catch (e) {
+    return { success: false, msg: "Error: " + e.message };
+  }
+}

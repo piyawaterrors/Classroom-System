@@ -56,20 +56,21 @@
     border-color: #ef4444;
   }
 
-  /* Simple Checkbox Styling */
-  .checkbox-item {
-    transition: background-color 0.2s ease;
+  /* Score Input Styling */
+  .score-input {
+    width: 70px;
+    padding: 6px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    transition: all 0.2s ease;
   }
 
-  .checkbox-item:hover {
-    background: #f8fafc;
-  }
-
-  .checkbox-item input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    accent-color: #4f46e5;
+  .score-input:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
   }
 
   /* Progress Bar */
@@ -172,19 +173,18 @@
       <div
         class="flex items-center gap-2 mb-5 text-indigo-500 text-xs font-bold uppercase tracking-wider"
       >
-        <i class="fa-solid fa-clipboard-check"></i> Project Review
+        <i class="fa-solid fa-graduation-cap"></i> Final Exam
       </div>
 
       <!-- 1. Group Selection -->
       <div class="space-y-4 mb-6">
-        <div>
           <label class="text-[10px] font-bold text-slate-400 ml-1 uppercase"
             >เลือกกลุ่มเรียน</label
           >
           <div class="relative mt-1">
             <select
-              id="projectGroupSelect"
-              onchange="loadProjectData()"
+              id="finalExamGroupSelect"
+              onchange="loadFinalExamData()"
               class="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer shadow-sm text-slate-700 font-medium"
             >
               <option value="">-- กรุณาเลือก --</option>
@@ -196,8 +196,6 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
   </aside>
 
   <!-- STATS CARDS SECTION - Order 1 on mobile, show with main on desktop -->
@@ -376,7 +374,7 @@
         </h3>
         <div class="flex items-center gap-2">
           <button
-            onclick="refreshProjectTable()"
+            onclick="refreshFinalExamTable()"
             class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-indigo-600 transition"
           >
             <i class="fa-solid fa-rotate-right"></i>
@@ -436,7 +434,7 @@
             </tr>
           </thead>
           <tbody
-            id="projectTableBody"
+            id="finalExamTableBody"
             class="text-sm text-slate-600 divide-y divide-slate-100 bg-white/60"
           >
             <tr>
@@ -463,11 +461,12 @@
 >
   <div
     class="absolute inset-0 bg-slate-900/70 backdrop-blur-md modal-backdrop"
+    onclick="closeReviewModal()"
   ></div>
   <div
-    class="modal-content bg-white rounded-[28px] shadow-2xl w-full max-w-3xl relative flex flex-col border border-white/50 max-h-[90vh] overflow-hidden"
+    class="modal-content bg-white rounded-[28px] shadow-2xl w-full max-w-4xl relative flex flex-col border border-white/50 max-h-[90vh] overflow-hidden"
   >
-    <!-- Modal Header - Simple & Clean -->
+    <!-- Modal Header -->
     <div
       class="relative bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200"
     >
@@ -500,14 +499,12 @@
           </div>
         </div>
 
-        <!-- Progress Bar - Minimal -->
+        <!-- Progress Bar -->
         <div class="bg-white rounded-lg p-3 border border-slate-200">
           <div class="flex justify-between items-center mb-2">
-            <span class="text-xs font-semibold text-slate-600"
-              >ความคืบหน้า</span
-            >
+            <span class="text-xs font-semibold text-slate-600">คะแนนรวม</span>
             <span class="text-xs font-bold text-indigo-600" id="progressText"
-              >0/10</span
+              >0/30</span
             >
           </div>
           <div class="progress-bar bg-slate-100">
@@ -524,7 +521,7 @@
     <!-- Modal Body - Scrollable -->
     <div class="flex-1 overflow-y-auto p-6 bg-white">
       <div class="space-y-4">
-        <!-- Section 1: Sprint 1 -->
+        <!-- Section 1: Tasks บน GitHub Board -->
         <div
           class="bg-slate-50 rounded-xl p-4 border border-slate-200 hover:border-slate-300 transition-all"
         >
@@ -535,63 +532,62 @@
               1
             </div>
             <h3 class="text-base font-bold text-slate-700">
-              ระบบย่อย Sprint 1
+              Tasks บน GitHub Board (8 คะแนน)
             </h3>
           </div>
           <div class="space-y-2">
             <label
-              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer bg-white"
             >
               <input
                 type="checkbox"
-                id="check_1_1"
+                id="score_1_1"
                 onchange="updateProgress()"
                 class="mt-0.5"
               />
               <label
-                for="check_1_1"
+                for="score_1_1"
                 class="text-sm text-slate-600 cursor-pointer flex-1"
               >
-                โปรแกรมทำงานตรงกับการออกแบบระบบ
+                1.1 มี 3 Tasks ครบตามโจทย์ และชื่อ/รายละเอียดชัดเจน (3 คะแนน)
               </label>
             </label>
             <label
-              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer bg-white"
             >
               <input
                 type="checkbox"
-                id="check_1_2"
+                id="score_1_2"
                 onchange="updateProgress()"
                 class="mt-0.5"
               />
               <label
-                for="check_1_2"
+                for="score_1_2"
                 class="text-sm text-slate-600 cursor-pointer flex-1"
               >
-                ตรวจสอบว่าโครงสร้าง Database ใน SQLite เป็นไปตามที่กำหนด
+                1.2 มี Repo: github.com/&lt;account&gt;/sut-final-lab (2 คะแนน)
               </label>
             </label>
             <label
-              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer bg-white"
             >
               <input
                 type="checkbox"
-                id="check_1_3"
+                id="score_1_3"
                 onchange="updateProgress()"
                 class="mt-0.5"
               />
               <label
-                for="check_1_3"
+                for="score_1_3"
                 class="text-sm text-slate-600 cursor-pointer flex-1"
               >
-                ตรวจสอบว่าข้อมูลสามารถ Insert, Update, Delete และ Query
-                ได้อย่างถูกต้อง
+                1.3 Tasks ทั้ง 3 ต้องอยู่สถานะ Done (3 คะแนน)
               </label>
             </label>
           </div>
         </div>
 
-        <!-- Section 2: Sprint 2 -->
+        <!-- Section 2: Unit Test + Validation -->
         <div
           class="bg-slate-50 rounded-xl p-4 border border-slate-200 hover:border-slate-300 transition-all"
         >
@@ -602,63 +598,217 @@
               2
             </div>
             <h3 class="text-base font-bold text-slate-700">
-              ระบบย่อย Sprint 2
+              Unit Test + Validation (11 คะแนน)
             </h3>
           </div>
           <div class="space-y-2">
             <label
-              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer bg-white"
             >
               <input
                 type="checkbox"
-                id="check_2_1"
+                id="score_2_1"
                 onchange="updateProgress()"
                 class="mt-0.5"
               />
               <label
-                for="check_2_1"
+                for="score_2_1"
                 class="text-sm text-slate-600 cursor-pointer flex-1"
               >
-                โปรแกรมทำงานตรงกับการออกแบบระบบ
+                2.1 ใช้ govalidator แบบ struct tag ตามเงื่อนไขโจทย์ (4 คะแนน)
               </label>
             </label>
             <label
-              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer bg-white"
             >
               <input
                 type="checkbox"
-                id="check_2_2"
+                id="score_2_2"
                 onchange="updateProgress()"
                 class="mt-0.5"
               />
               <label
-                for="check_2_2"
+                for="score_2_2"
                 class="text-sm text-slate-600 cursor-pointer flex-1"
               >
-                ตรวจสอบว่าโครงสร้าง Database ใน SQLite เป็นไปตามที่กำหนด
+                2.2 ใช้ gomega ในการ assert ผลการทดสอบ (4 คะแนน)
               </label>
             </label>
-            <label
-              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
-            >
-              <input
-                type="checkbox"
-                id="check_2_3"
-                onchange="updateProgress()"
-                class="mt-0.5"
-              />
-              <label
-                for="check_2_3"
-                class="text-sm text-slate-600 cursor-pointer flex-1"
-              >
-                ตรวจสอบว่าข้อมูลสามารถ Insert, Update, Delete และ Query
-                ได้อย่างถูกต้อง
-              </label>
-            </label>
+
+            <!-- 2.3 A) แยกไฟล์ตาม Task -->
+            <div class="bg-slate-100 rounded-lg p-3 border border-slate-200">
+              <div class="text-xs font-bold text-slate-600 mb-2">
+                2.3 A) แยกไฟล์ตาม Task
+              </div>
+              <div class="space-y-1.5 ml-2">
+                <label
+                  class="checkbox-item flex items-start gap-2 p-2 rounded-lg cursor-pointer bg-white hover:bg-indigo-50"
+                >
+                  <input
+                    type="checkbox"
+                    id="score_2_3_a_1"
+                    onchange="handleSingleChoice('2_3_a', '1')"
+                    class="mt-0.5"
+                  />
+                  <label
+                    for="score_2_3_a_1"
+                    class="text-sm text-slate-600 cursor-pointer flex-1"
+                  >
+                    2.3.1 มี 3 ไฟล์ (1.0 คะแนน)
+                  </label>
+                </label>
+                <label
+                  class="checkbox-item flex items-start gap-2 p-2 rounded-lg cursor-pointer bg-white hover:bg-indigo-50"
+                >
+                  <input
+                    type="checkbox"
+                    id="score_2_3_a_2"
+                    onchange="handleSingleChoice('2_3_a', '2')"
+                    class="mt-0.5"
+                  />
+                  <label
+                    for="score_2_3_a_2"
+                    class="text-sm text-slate-600 cursor-pointer flex-1"
+                  >
+                    2.3.2 มี 2 ไฟล์ (0.5 คะแนน)
+                  </label>
+                </label>
+                <label
+                  class="checkbox-item flex items-start gap-2 p-2 rounded-lg cursor-pointer bg-white hover:bg-indigo-50"
+                >
+                  <input
+                    type="checkbox"
+                    id="score_2_3_a_3"
+                    onchange="handleSingleChoice('2_3_a', '3')"
+                    class="mt-0.5"
+                  />
+                  <label
+                    for="score_2_3_a_3"
+                    class="text-sm text-slate-600 cursor-pointer flex-1"
+                  >
+                    2.3.3 มี 1 ไฟล์ (0 คะแนน)
+                  </label>
+                </label>
+              </div>
+            </div>
+
+            <!-- 2.3 B) ความครบของ Test Cases -->
+            <div class="bg-slate-100 rounded-lg p-3 border border-slate-200">
+              <div class="text-xs font-bold text-slate-600 mb-2">
+                2.3 B) ความครบของ Test Cases
+              </div>
+              <div class="space-y-1.5 ml-2">
+                <label
+                  class="checkbox-item flex items-start gap-2 p-2 rounded-lg cursor-pointer bg-white hover:bg-indigo-50"
+                >
+                  <input
+                    type="checkbox"
+                    id="score_2_3_b_1"
+                    onchange="handleSingleChoice('2_3_b', '1')"
+                    class="mt-0.5"
+                  />
+                  <label
+                    for="score_2_3_b_1"
+                    class="text-sm text-slate-600 cursor-pointer flex-1"
+                  >
+                    2.3.1 ครบ 3 เคส (1 positive + 2 negative) (1.0 คะแนน)
+                  </label>
+                </label>
+                <label
+                  class="checkbox-item flex items-start gap-2 p-2 rounded-lg cursor-pointer bg-white hover:bg-indigo-50"
+                >
+                  <input
+                    type="checkbox"
+                    id="score_2_3_b_2"
+                    onchange="handleSingleChoice('2_3_b', '2')"
+                    class="mt-0.5"
+                  />
+                  <label
+                    for="score_2_3_b_2"
+                    class="text-sm text-slate-600 cursor-pointer flex-1"
+                  >
+                    2.3.2 ขาด 1 เคส (0.5 คะแนน)
+                  </label>
+                </label>
+                <label
+                  class="checkbox-item flex items-start gap-2 p-2 rounded-lg cursor-pointer bg-white hover:bg-indigo-50"
+                >
+                  <input
+                    type="checkbox"
+                    id="score_2_3_b_3"
+                    onchange="handleSingleChoice('2_3_b', '3')"
+                    class="mt-0.5"
+                  />
+                  <label
+                    for="score_2_3_b_3"
+                    class="text-sm text-slate-600 cursor-pointer flex-1"
+                  >
+                    2.3.3 มี 1 เคส (0 คะแนน)
+                  </label>
+                </label>
+              </div>
+            </div>
+
+            <!-- 2.3 C) Negative tests ตรวจ error message -->
+            <div class="bg-slate-100 rounded-lg p-3 border border-slate-200">
+              <div class="text-xs font-bold text-slate-600 mb-2">
+                2.3 C) Negative tests ตรวจ error message ตรงโจทย์
+              </div>
+              <div class="space-y-1.5 ml-2">
+                <label
+                  class="checkbox-item flex items-start gap-2 p-2 rounded-lg cursor-pointer bg-white hover:bg-indigo-50"
+                >
+                  <input
+                    type="checkbox"
+                    id="score_2_3_c_1"
+                    onchange="handleSingleChoice('2_3_c', '1')"
+                    class="mt-0.5"
+                  />
+                  <label
+                    for="score_2_3_c_1"
+                    class="text-sm text-slate-600 cursor-pointer flex-1"
+                  >
+                    2.3.1 ตรง 2 เคส (1.0 คะแนน)
+                  </label>
+                </label>
+                <label
+                  class="checkbox-item flex items-start gap-2 p-2 rounded-lg cursor-pointer bg-white hover:bg-indigo-50"
+                >
+                  <input
+                    type="checkbox"
+                    id="score_2_3_c_2"
+                    onchange="handleSingleChoice('2_3_c', '2')"
+                    class="mt-0.5"
+                  />
+                  <label
+                    for="score_2_3_c_2"
+                    class="text-sm text-slate-600 cursor-pointer flex-1"
+                  >
+                    2.3.2 ตรง 1 เคส (0.5 คะแนน)
+                  </label>
+                </label>
+                <label
+                  class="checkbox-item flex items-start gap-2 p-2 rounded-lg cursor-pointer bg-white hover:bg-indigo-50"
+                >
+                  <input
+                    type="checkbox"
+                    id="score_2_3_c_3"
+                    onchange="handleSingleChoice('2_3_c', '3')"
+                    class="mt-0.5"
+                  />
+                  <label
+                    for="score_2_3_c_3"
+                    class="text-sm text-slate-600 cursor-pointer flex-1"
+                  >
+                    2.3.3 ไม่ตรงหรือไม่ตรวจ (0 คะแนน)
+                  </label>
+                </label>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Section 3: Unit Test -->
+        <!-- Section 3: Git Workflow + Tests ผ่าน -->
         <div
           class="bg-slate-50 rounded-xl p-4 border border-slate-200 hover:border-slate-300 transition-all"
         >
@@ -669,97 +819,65 @@
               3
             </div>
             <h3 class="text-base font-bold text-slate-700">
-              Unit Test ของ Entity หลัก
+              Git Workflow + Tests ผ่าน (11 คะแนน)
             </h3>
           </div>
           <div class="space-y-2">
             <label
-              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer bg-white"
             >
               <input
                 type="checkbox"
-                id="check_3_1"
+                id="score_3_1"
                 onchange="updateProgress()"
                 class="mt-0.5"
               />
               <label
-                for="check_3_1"
+                for="score_3_1"
                 class="text-sm text-slate-600 cursor-pointer flex-1"
               >
-                กรณีการทดสอบระบบแบบ Positive (1 กรณี)
+                3.1 แยก branch จาก main สำหรับแต่ละ Task และห้ามทำงานบน main
+                โดยตรง (3 คะแนน)
               </label>
             </label>
             <label
-              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer bg-white"
             >
               <input
                 type="checkbox"
-                id="check_3_2"
+                id="score_3_2"
                 onchange="updateProgress()"
                 class="mt-0.5"
               />
               <label
-                for="check_3_2"
+                for="score_3_2"
                 class="text-sm text-slate-600 cursor-pointer flex-1"
               >
-                กรณีการทดสอบระบบแบบ Negative (3 กรณี)
-              </label>
-            </label>
-          </div>
-        </div>
-
-        <!-- Section 4: UAT (Selenium) -->
-        <div
-          class="bg-slate-50 rounded-xl p-4 border border-slate-200 hover:border-slate-300 transition-all"
-        >
-          <div class="flex items-center gap-3 mb-3">
-            <div
-              class="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center text-slate-700 font-bold text-sm"
-            >
-              4
-            </div>
-            <h3 class="text-base font-bold text-slate-700">
-              UAT (Selenium) ของ Entity หลัก
-            </h3>
-          </div>
-          <div class="space-y-2">
-            <label
-              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
-            >
-              <input
-                type="checkbox"
-                id="check_4_1"
-                onchange="updateProgress()"
-                class="mt-0.5"
-              />
-              <label
-                for="check_4_1"
-                class="text-sm text-slate-600 cursor-pointer flex-1"
-              >
-                กรณีการทดสอบระบบแบบ Positive (1 กรณี)
+                3.2 มี PR ครบทุก Task และ merge เข้า main ถูกต้อง (3 คะแนน)
               </label>
             </label>
             <label
-              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer"
+              class="checkbox-item flex items-start gap-3 p-2.5 rounded-lg cursor-pointer bg-white"
             >
               <input
                 type="checkbox"
-                id="check_4_2"
+                id="score_3_3"
                 onchange="updateProgress()"
                 class="mt-0.5"
               />
               <label
-                for="check_4_2"
+                for="score_3_3"
                 class="text-sm text-slate-600 cursor-pointer flex-1"
               >
-                กรณีการทดสอบระบบแบบ Negative (3 กรณี)
+                3.3 รัน go test ./... ต้องผ่านทั้งหมดทั้งบน branch และหลัง merge
+                บน main (5 คะแนน)
               </label>
             </label>
           </div>
         </div>
       </div>
 
-      <!-- Modal Footer - Clean -->
+      <!-- Modal Footer -->
       <div class="p-5">
         <div class="flex gap-3">
           <button
@@ -785,8 +903,8 @@
   </div>
 
   <script>
-    let projectGroups = [];
-    let allProjectStudents = [];
+    let finalExamGroups = [];
+    let allFinalExamStudents = [];
     let currentStudentId = null;
     let currentSheetId = null;
 
@@ -794,8 +912,8 @@
     (function () {
       google.script.run
         .withSuccessHandler((data) => {
-          projectGroups = data;
-          const select = document.getElementById("projectGroupSelect");
+          finalExamGroups = data;
+          const select = document.getElementById("finalExamGroupSelect");
           data.forEach((g, i) => {
             let opt = document.createElement("option");
             opt.value = i;
@@ -806,21 +924,23 @@
         .getGroups();
     })();
 
-    // Load Project Data
-    function loadProjectData() {
-      const idx = document.getElementById("projectGroupSelect").value;
+    // Load Final Exam Data
+    function loadFinalExamData() {
+      const idx = document.getElementById("finalExamGroupSelect").value;
       resetDashboard();
+
+      // Clear both search boxes
+      const idSearchInput = document.getElementById("studentIdSearchInput");
+      const nameSearchInput = document.getElementById("studentNameSearchInput");
+      if (idSearchInput) idSearchInput.value = "";
+      if (nameSearchInput) nameSearchInput.value = "";
 
       if (idx === "") return;
 
-      const group = projectGroups[idx];
+      const group = finalExamGroups[idx];
       currentSheetId = group.id;
 
-      // Clear search inputs
-      document.getElementById("searchStudentId").value = "";
-      document.getElementById("searchStudentName").value = "";
-
-      const tbody = document.getElementById("projectTableBody");
+      const tbody = document.getElementById("finalExamTableBody");
       tbody.innerHTML = `
       <tr>
         <td colspan="4" class="text-center py-20 text-slate-400">
@@ -838,19 +958,19 @@
       google.script.run
         .withSuccessHandler((res) => {
           if (res.success) {
-            allProjectStudents = res.students;
-            renderProjectTable(res.students);
+            allFinalExamStudents = res.students;
+            renderFinalExamTable(res.students);
           } else {
             showToast(res.msg, "error");
             resetDashboard();
           }
         })
-        .getProjectReviewData(group.id);
+        .getFinalExamData(group.id);
     }
 
     // Render Table
-    function renderProjectTable(students, updateStats = true) {
-      const tbody = document.getElementById("projectTableBody");
+    function renderFinalExamTable(students, skipStats = false) {
+      const tbody = document.getElementById("finalExamTableBody");
 
       if (!students || students.length === 0) {
         tbody.innerHTML =
@@ -892,32 +1012,25 @@
 
       tbody.innerHTML = html;
 
-      // Only update stats if updateStats is true
-      if (updateStats) {
-        // Calculate stats from all students, not filtered
-        const totalStudents = allProjectStudents.length;
-        const totalReviewed = allProjectStudents.filter(
-          (s) => s.reviewed
-        ).length;
-        const totalNotReviewed = totalStudents - totalReviewed;
-
+      // Only update stats if NOT filtering (skipStats = false)
+      if (!skipStats) {
         // Update Stats (both mobile and desktop cards)
         animateValue(
           "dashTotal",
           parseInt(document.getElementById("dashTotal").innerText),
-          totalStudents,
+          students.length,
           500
         );
         animateValue(
           "dashReviewed",
           parseInt(document.getElementById("dashReviewed").innerText),
-          totalReviewed,
+          reviewedCount,
           500
         );
         animateValue(
           "dashNotReviewed",
           parseInt(document.getElementById("dashNotReviewed").innerText),
-          totalNotReviewed,
+          notReviewedCount,
           500
         );
 
@@ -930,7 +1043,7 @@
           animateValue(
             "dashTotal2",
             parseInt(dashTotal2.innerText),
-            totalStudents,
+            students.length,
             500
           );
         }
@@ -938,7 +1051,7 @@
           animateValue(
             "dashReviewed2",
             parseInt(dashReviewed2.innerText),
-            totalReviewed,
+            reviewedCount,
             500
           );
         }
@@ -946,7 +1059,7 @@
           animateValue(
             "dashNotReviewed2",
             parseInt(dashNotReviewed2.innerText),
-            totalNotReviewed,
+            notReviewedCount,
             500
           );
         }
@@ -965,14 +1078,14 @@
         .trim();
 
       // Filter the students array
-      const filteredStudents = allProjectStudents.filter((student) => {
+      const filteredStudents = allFinalExamStudents.filter((student) => {
         const matchId = student.id.toLowerCase().includes(searchId);
         const matchName = student.name.toLowerCase().includes(searchName);
         return matchId && matchName;
       });
 
-      // Re-render table with filtered results, but don't update stats
-      renderProjectTable(filteredStudents, false);
+      // Render filtered results WITHOUT updating statistics
+      renderFinalExamTable(filteredStudents, true); // true = skip stats update
     }
 
     // Open Review Modal
@@ -981,22 +1094,77 @@
       document.getElementById("modalStudentName").innerText = studentName;
       document.getElementById("modalStudentID").innerText = studentId;
 
-      // Reset all checkboxes
-      for (let i = 1; i <= 4; i++) {
-        for (let j = 1; j <= 3; j++) {
-          const checkbox = document.getElementById(`check_${i}_${j}`);
-          if (checkbox) checkbox.checked = false;
-        }
-      }
+      // Reset all checkboxes (including sub-options)
+      const allCheckboxIds = [
+        "score_1_1",
+        "score_1_2",
+        "score_1_3",
+        "score_2_1",
+        "score_2_2",
+        "score_2_3_a_1",
+        "score_2_3_a_2",
+        "score_2_3_a_3",
+        "score_2_3_b_1",
+        "score_2_3_b_2",
+        "score_2_3_b_3",
+        "score_2_3_c_1",
+        "score_2_3_c_2",
+        "score_2_3_c_3",
+        "score_3_1",
+        "score_3_2",
+        "score_3_3",
+      ];
+
+      allCheckboxIds.forEach((id) => {
+        const checkbox = document.getElementById(id);
+        if (checkbox) checkbox.checked = false;
+      });
 
       // Load existing data
-      const student = allProjectStudents.find((s) => s.id === studentId);
-      if (student && student.checkboxes) {
-        student.checkboxes.forEach((checked, index) => {
-          const checkboxId = getCheckboxId(index);
-          const checkbox = document.getElementById(checkboxId);
-          if (checkbox) checkbox.checked = checked;
-        });
+      const student = allFinalExamStudents.find((s) => s.id === studentId);
+      if (student && student.scores && student.scores.length >= 11) {
+        // Section 1 (3 scores)
+        if (student.scores[0] > 0)
+          document.getElementById("score_1_1").checked = true;
+        if (student.scores[1] > 0)
+          document.getElementById("score_1_2").checked = true;
+        if (student.scores[2] > 0)
+          document.getElementById("score_1_3").checked = true;
+
+        // Section 2.1-2.2 (2 scores)
+        if (student.scores[3] > 0)
+          document.getElementById("score_2_1").checked = true;
+        if (student.scores[4] > 0)
+          document.getElementById("score_2_2").checked = true;
+
+        // Section 2.3 A (1 combined score -> map to sub-options)
+        const score_2_3_a = student.scores[5];
+        if (score_2_3_a >= 1.0)
+          document.getElementById("score_2_3_a_1").checked = true;
+        else if (score_2_3_a >= 0.5)
+          document.getElementById("score_2_3_a_2").checked = true;
+
+        // Section 2.3 B (1 combined score -> map to sub-options)
+        const score_2_3_b = student.scores[6];
+        if (score_2_3_b >= 1.0)
+          document.getElementById("score_2_3_b_1").checked = true;
+        else if (score_2_3_b >= 0.5)
+          document.getElementById("score_2_3_b_2").checked = true;
+
+        // Section 2.3 C (1 combined score -> map to sub-options)
+        const score_2_3_c = student.scores[7];
+        if (score_2_3_c >= 1.0)
+          document.getElementById("score_2_3_c_1").checked = true;
+        else if (score_2_3_c >= 0.5)
+          document.getElementById("score_2_3_c_2").checked = true;
+
+        // Section 3 (3 scores)
+        if (student.scores[8] > 0)
+          document.getElementById("score_3_1").checked = true;
+        if (student.scores[9] > 0)
+          document.getElementById("score_3_2").checked = true;
+        if (student.scores[10] > 0)
+          document.getElementById("score_3_3").checked = true;
       }
 
       // Update progress bar
@@ -1022,48 +1190,71 @@
       currentStudentId = null;
     }
 
-    // Get Checkbox ID from index
-    function getCheckboxId(index) {
-      const mapping = [
-        "check_1_1",
-        "check_1_2",
-        "check_1_3",
-        "check_2_1",
-        "check_2_2",
-        "check_2_3",
-        "check_3_1",
-        "check_3_2",
-        "check_4_1",
-        "check_4_2",
-      ];
-      return mapping[index];
+    // Handle Single Choice (Radio-like behavior with toggle-off)
+    function handleSingleChoice(group, option) {
+      const checkboxId = `score_${group}_${option}`;
+      const checkbox = document.getElementById(checkboxId);
+
+      // If this checkbox was just checked
+      if (checkbox.checked) {
+        // Uncheck all other checkboxes in the same group
+        for (let i = 1; i <= 3; i++) {
+          if (i.toString() !== option) {
+            const otherCheckbox = document.getElementById(
+              `score_${group}_${i}`
+            );
+            if (otherCheckbox) {
+              otherCheckbox.checked = false;
+            }
+          }
+        }
+      }
+
+      // Update progress
+      updateProgress();
     }
 
     // Update Progress Bar
     function updateProgress() {
-      const checkboxIds = [
-        "check_1_1",
-        "check_1_2",
-        "check_1_3",
-        "check_2_1",
-        "check_2_2",
-        "check_2_3",
-        "check_3_1",
-        "check_3_2",
-        "check_4_1",
-        "check_4_2",
-      ];
+      let totalScore = 0;
 
-      let checkedCount = 0;
-      checkboxIds.forEach((id) => {
-        const checkbox = document.getElementById(id);
-        if (checkbox && checkbox.checked) {
-          checkedCount++;
-        }
-      });
+      // Section 1: GitHub Tasks (8 points)
+      if (document.getElementById("score_1_1")?.checked) totalScore += 3;
+      if (document.getElementById("score_1_2")?.checked) totalScore += 2;
+      if (document.getElementById("score_1_3")?.checked) totalScore += 3;
 
-      const total = checkboxIds.length;
-      const percentage = (checkedCount / total) * 100;
+      // Section 2.1-2.2: Unit Test basics (8 points)
+      if (document.getElementById("score_2_1")?.checked) totalScore += 4;
+      if (document.getElementById("score_2_2")?.checked) totalScore += 4;
+
+      // Section 2.3 A: แยกไฟล์ (max 1 point)
+      if (document.getElementById("score_2_3_a_1")?.checked) totalScore += 1.0;
+      else if (document.getElementById("score_2_3_a_2")?.checked)
+        totalScore += 0.5;
+      else if (document.getElementById("score_2_3_a_3")?.checked)
+        totalScore += 0;
+
+      // Section 2.3 B: ความครบของ Test Cases (max 1 point)
+      if (document.getElementById("score_2_3_b_1")?.checked) totalScore += 1.0;
+      else if (document.getElementById("score_2_3_b_2")?.checked)
+        totalScore += 0.5;
+      else if (document.getElementById("score_2_3_b_3")?.checked)
+        totalScore += 0;
+
+      // Section 2.3 C: Error message (max 1 point)
+      if (document.getElementById("score_2_3_c_1")?.checked) totalScore += 1.0;
+      else if (document.getElementById("score_2_3_c_2")?.checked)
+        totalScore += 0.5;
+      else if (document.getElementById("score_2_3_c_3")?.checked)
+        totalScore += 0;
+
+      // Section 3: Git Workflow (11 points)
+      if (document.getElementById("score_3_1")?.checked) totalScore += 3;
+      if (document.getElementById("score_3_2")?.checked) totalScore += 3;
+      if (document.getElementById("score_3_3")?.checked) totalScore += 5;
+
+      const maxScore = 30;
+      const percentage = (totalScore / maxScore) * 100;
 
       // Update progress bar
       const progressFill = document.getElementById("progressFill");
@@ -1074,7 +1265,7 @@
       }
 
       if (progressText) {
-        progressText.innerText = `${checkedCount}/${total}`;
+        progressText.innerText = `${totalScore}/${maxScore}`;
       }
     }
 
@@ -1082,25 +1273,48 @@
     function submitReview() {
       if (!currentStudentId || !currentSheetId) return;
 
-      // Collect checkbox values
-      const checkboxValues = [];
-      const checkboxIds = [
-        "check_1_1",
-        "check_1_2",
-        "check_1_3",
-        "check_2_1",
-        "check_2_2",
-        "check_2_3",
-        "check_3_1",
-        "check_3_2",
-        "check_4_1",
-        "check_4_2",
-      ];
+      const scoreValues = [];
 
-      checkboxIds.forEach((id) => {
-        const checkbox = document.getElementById(id);
-        checkboxValues.push(checkbox ? checkbox.checked : false);
-      });
+      // Section 1 (3 scores)
+      scoreValues.push(document.getElementById("score_1_1")?.checked ? 3 : 0);
+      scoreValues.push(document.getElementById("score_1_2")?.checked ? 2 : 0);
+      scoreValues.push(document.getElementById("score_1_3")?.checked ? 3 : 0);
+
+      // Section 2.1-2.2 (2 scores)
+      scoreValues.push(document.getElementById("score_2_1")?.checked ? 4 : 0);
+      scoreValues.push(document.getElementById("score_2_2")?.checked ? 4 : 0);
+
+      // Section 2.3 A (1 combined score)
+      let score_2_3_a = 0;
+      if (document.getElementById("score_2_3_a_1")?.checked) score_2_3_a = 1.0;
+      else if (document.getElementById("score_2_3_a_2")?.checked)
+        score_2_3_a = 0.5;
+      else if (document.getElementById("score_2_3_a_3")?.checked)
+        score_2_3_a = 0;
+      scoreValues.push(score_2_3_a);
+
+      // Section 2.3 B (1 combined score)
+      let score_2_3_b = 0;
+      if (document.getElementById("score_2_3_b_1")?.checked) score_2_3_b = 1.0;
+      else if (document.getElementById("score_2_3_b_2")?.checked)
+        score_2_3_b = 0.5;
+      else if (document.getElementById("score_2_3_b_3")?.checked)
+        score_2_3_b = 0;
+      scoreValues.push(score_2_3_b);
+
+      // Section 2.3 C (1 combined score)
+      let score_2_3_c = 0;
+      if (document.getElementById("score_2_3_c_1")?.checked) score_2_3_c = 1.0;
+      else if (document.getElementById("score_2_3_c_2")?.checked)
+        score_2_3_c = 0.5;
+      else if (document.getElementById("score_2_3_c_3")?.checked)
+        score_2_3_c = 0;
+      scoreValues.push(score_2_3_c);
+
+      // Section 3 (3 scores)
+      scoreValues.push(document.getElementById("score_3_1")?.checked ? 3 : 0);
+      scoreValues.push(document.getElementById("score_3_2")?.checked ? 3 : 0);
+      scoreValues.push(document.getElementById("score_3_3")?.checked ? 5 : 0);
 
       const btn = document.getElementById("btnSubmitReview");
       btn.disabled = true;
@@ -1115,29 +1329,37 @@
           if (res.success) {
             showToast("บันทึกข้อมูลเรียบร้อย", "success");
             closeReviewModal();
-            loadProjectData(); // Refresh table
+            loadFinalExamData(); // Refresh table
           } else {
             showToast(res.msg, "error");
           }
         })
-        .saveProjectReview(currentSheetId, currentStudentId, checkboxValues);
+        .saveFinalExam(currentSheetId, currentStudentId, scoreValues);
     }
 
     // Refresh Table
-    function refreshProjectTable() {
+    function refreshFinalExamTable() {
       const icon = event.currentTarget.querySelector("i");
       icon.classList.add("fa-spin");
-      loadProjectData();
+      loadFinalExamData();
       setTimeout(() => icon.classList.remove("fa-spin"), 1000);
     }
 
     // Reset Dashboard
     function resetDashboard() {
-      document.getElementById("projectTableBody").innerHTML =
+      document.getElementById("finalExamTableBody").innerHTML =
         '<tr><td colspan="4" class="p-20 text-center text-slate-400 italic"><div class="flex flex-col items-center gap-4 opacity-60"><i class="fa-solid fa-clipboard-question text-6xl text-slate-300"></i><span>กรุณาเลือกกลุ่มเรียน</span></div></td></tr>';
       document.getElementById("dashTotal").innerText = "0";
       document.getElementById("dashReviewed").innerText = "0";
       document.getElementById("dashNotReviewed").innerText = "0";
+
+      const dashTotal2 = document.getElementById("dashTotal2");
+      const dashReviewed2 = document.getElementById("dashReviewed2");
+      const dashNotReviewed2 = document.getElementById("dashNotReviewed2");
+
+      if (dashTotal2) dashTotal2.innerText = "0";
+      if (dashReviewed2) dashReviewed2.innerText = "0";
+      if (dashNotReviewed2) dashNotReviewed2.innerText = "0";
     }
 
     // Toast Notification

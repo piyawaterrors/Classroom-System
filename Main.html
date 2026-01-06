@@ -207,7 +207,10 @@
               <? } else if (activePage == 'project') { ?>
                 <i class="fa-solid fa-clipboard-check text-sm"></i>
                 <span class="font-medium text-sm">Project Review</span>
-                <? } ?>
+                <? } else if (activePage == 'finalexam') { ?>
+                  <i class="fa-solid fa-graduation-cap text-sm"></i>
+                  <span class="font-medium text-sm">Final Exam</span>
+                  <? } ?>
             </div>
             <button onclick="toggleMobileMenu()"
               class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10 transition">
@@ -232,6 +235,10 @@
         <a href="<?= url ?>?page=project"
           class="nav-link px-3 py-2 hover:bg-white/10 transition flex items-center gap-2 text-sm whitespace-nowrap rounded-lg <?= activePage == 'project' ? 'active' : '' ?>">
           <i class="fa-solid fa-clipboard-check"></i> <span>Project Review</span>
+        </a>
+        <a href="<?= url ?>?page=finalexam"
+          class="nav-link px-3 py-2 hover:bg-white/10 transition flex items-center gap-2 text-sm whitespace-nowrap rounded-lg <?= activePage == 'finalexam' ? 'active' : '' ?>">
+          <i class="fa-solid fa-graduation-cap"></i> <span>Final Exam</span>
         </a>
         <button onclick="openGroupSettingsModal()"
           class="nav-link px-3 py-2 hover:bg-white/10 transition flex items-center gap-2 text-sm whitespace-nowrap rounded-lg border border-white/20 ml-2">
@@ -293,6 +300,11 @@
           <i class="fa-solid fa-clipboard-check text-lg w-6"></i>
           <span class="font-medium">Project Review</span>
         </a>
+        <a href="<?= url ?>?page=finalexam"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 transition <?= activePage == 'finalexam' ? 'bg-white/20' : '' ?>">
+          <i class="fa-solid fa-graduation-cap text-lg w-6"></i>
+          <span class="font-medium">Final Exam</span>
+        </a>
         <button onclick="openGroupSettingsModal(); toggleMobileMenu();"
           class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 transition border border-white/20">
           <i class="fa-solid fa-gear text-lg w-6"></i>
@@ -314,6 +326,8 @@
     <?!= include('PageScrum'); ?>
     <? } else if (activePage == 'project') { ?>
     <?!= include('PageProjectReview'); ?>
+    <? } else if (activePage == 'finalexam') { ?>
+    <?!= include('PageFinalExam'); ?>
     <? } else { ?>
     <div class="p-10 text-center text-red-500">
       Page not found:
