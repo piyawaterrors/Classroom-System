@@ -210,7 +210,10 @@
                 <? } else if (activePage == 'finalexam') { ?>
                   <i class="fa-solid fa-graduation-cap text-sm"></i>
                   <span class="font-medium text-sm">Final Exam</span>
-                  <? } ?>
+                  <? } else if (activePage == 'projectcheck') { ?>
+                    <i class="fa-solid fa-clipboard-list text-sm"></i>
+                    <span class="font-medium text-sm">ตรวจ Project</span>
+                    <? } ?>
             </div>
             <button onclick="toggleMobileMenu()"
               class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10 transition">
@@ -239,6 +242,10 @@
         <a href="<?= url ?>?page=finalexam"
           class="nav-link px-3 py-2 hover:bg-white/10 transition flex items-center gap-2 text-sm whitespace-nowrap rounded-lg <?= activePage == 'finalexam' ? 'active' : '' ?>">
           <i class="fa-solid fa-graduation-cap"></i> <span>Final Exam</span>
+        </a>
+        <a href="<?= url ?>?page=projectcheck"
+          class="nav-link px-3 py-2 hover:bg-white/10 transition flex items-center gap-2 text-sm whitespace-nowrap rounded-lg <?= activePage == 'projectcheck' ? 'active' : '' ?>">
+          <i class="fa-solid fa-clipboard-list"></i> <span>ตรวจ Project</span>
         </a>
         <button onclick="openGroupSettingsModal()"
           class="nav-link px-3 py-2 hover:bg-white/10 transition flex items-center gap-2 text-sm whitespace-nowrap rounded-lg border border-white/20 ml-2">
@@ -300,6 +307,11 @@
           <i class="fa-solid fa-clipboard-check text-lg w-6"></i>
           <span class="font-medium">Project Review</span>
         </a>
+        <a href="<?= url ?>?page=projectcheck"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 transition <?= activePage == 'projectcheck' ? 'bg-white/20' : '' ?>">
+          <i class="fa-solid fa-clipboard-list text-lg w-6"></i>
+          <span class="font-medium">ตรวจ Project</span>
+        </a>
         <a href="<?= url ?>?page=finalexam"
           class="flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 transition <?= activePage == 'finalexam' ? 'bg-white/20' : '' ?>">
           <i class="fa-solid fa-graduation-cap text-lg w-6"></i>
@@ -326,6 +338,8 @@
     <?!= include('PageScrum'); ?>
     <? } else if (activePage == 'project') { ?>
     <?!= include('PageProjectReview'); ?>
+    <? } else if (activePage == 'projectcheck') { ?>
+    <?!= include('PageProjectCheck'); ?>
     <? } else if (activePage == 'finalexam') { ?>
     <?!= include('PageFinalExam'); ?>
     <? } else { ?>
